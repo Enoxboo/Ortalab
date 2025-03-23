@@ -6,13 +6,10 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.ArrayList;
-import java.util.stream.Collectors;
-import java.util.Map;
-import java.util.Comparator;
-import java.util.HashMap;
 import java.util.Collections;
 
 public class HandEvaluator {
+    // Points values for each hand type
     private static final int HIGH_CARD_POINTS = 10;
     private static final int PAIR_POINTS = 20;
     private static final int TWO_PAIR_POINTS = 40;
@@ -27,95 +24,120 @@ public class HandEvaluator {
     private final List<Card> cards;
     private String handType;
     private int points;
-    private final Set<Card> usedCards;
+    private final Set<Card> usedCards;  // All cards used in the hand (including kickers)
+    private final Set<Card> coreCards;  // Only the essential cards for the combination
 
+    /**
+     * Creates a new HandEvaluator for the given cards.
+     *
+     * @param cards The cards to evaluate
+     */
     public HandEvaluator(List<Card> cards) {
-        if (cards == null || cards.size() < 5) {
-            throw new IllegalArgumentException("A poker hand must contain at least 5 cards");
+        if (cards == null || cards.isEmpty()) {
+            throw new IllegalArgumentException("A hand must contain at least one card");
         }
         this.cards = new ArrayList<>(cards);
         this.usedCards = new HashSet<>();
+        this.coreCards = new HashSet<>();
         evaluateHand();
     }
 
+    /**
+     * Evaluates the hand to find the best possible poker combination.
+     */
     private void evaluateHand() {
         usedCards.clear();
+        coreCards.clear();
 
-        if (RoyalFlushChecker.isRoyalFlush(cards, usedCards)) {
+        // Check for each hand type in order from highest to lowest
+        if (cards.size() >= 5 && RoyalFlushChecker.isRoyalFlush(cards, usedCards)) {
             handType = "Royal Flush";
             points = ROYAL_FLUSH_POINTS;
-        } else if (StraightFlushChecker.isStraightFlush(cards, usedCards)) {
+            coreCards.addAll(usedCards); // In a royal flush, all cards are core
+        } else if (cards.size() >= 5 && StraightFlushChecker.isStraightFlush(cards, usedCards)) {
             handType = "Straight Flush";
             points = STRAIGHT_FLUSH_POINTS;
-        } else if (FourOfAKindChecker.isFourOfAKind(cards, usedCards)) {
+            coreCards.addAll(usedCards); // In a straight flush, all cards are core
+        } else if (cards.size() >= 5 && FourOfAKindChecker.isFourOfAKind(cards, usedCards)) {
             handType = "Four of a Kind";
             points = FOUR_OF_A_KIND_POINTS;
-        } else if (FullHouseChecker.isFullHouse(cards, usedCards)) {
+            // Only the four matching cards are core, not the kicker
+            FourOfAKindChecker.identifyFourOfAKindCoreCards(usedCards, coreCards);
+        } else if (cards.size() >= 5 && FullHouseChecker.isFullHouse(cards, usedCards)) {
             handType = "Full House";
             points = FULL_HOUSE_POINTS;
-        } else if (FlushChecker.isFlush(cards, usedCards)) {
+            // Both the three of a kind and the pair are core
+            coreCards.addAll(usedCards);
+        } else if (cards.size() >= 5 && FlushChecker.isFlush(cards, usedCards)) {
             handType = "Flush";
             points = FLUSH_POINTS;
-        } else if (StraightChecker.isStraight(cards, usedCards)) {
+            coreCards.addAll(usedCards); // In a flush, all cards are core
+        } else if (cards.size() >= 5 && StraightChecker.isStraight(cards, usedCards)) {
             handType = "Straight";
             points = STRAIGHT_POINTS;
-        } else if (ThreeOfAKindChecker.isThreeOfAKind(cards, usedCards)) {
+            coreCards.addAll(usedCards); // In a straight, all cards are core
+        } else if (cards.size() >= 3 && ThreeOfAKindChecker.isThreeOfAKind(cards, usedCards)) {
             handType = "Three of a Kind";
             points = THREE_OF_A_KIND_POINTS;
-        } else if (TwoPairsChecker.isTwoPair(cards, usedCards)) {
+            // Only the three matching cards are core, not the kickers
+            ThreeOfAKindChecker.identifyThreeOfAKindCoreCards(usedCards, coreCards);
+        } else if (cards.size() >= 4 && TwoPairsChecker.isTwoPair(cards, usedCards)) {
             handType = "Two Pair";
             points = TWO_PAIR_POINTS;
-        } else if (PairChecker.isPair(cards, usedCards)) {
+            // Only the two pairs are core, not the kicker
+            TwoPairsChecker.identifyTwoPairCoreCards(usedCards, coreCards);
+        } else if (cards.size() >= 2 && PairChecker.isPair(cards, usedCards)) {
             handType = "Pair";
             points = PAIR_POINTS;
+            // Only the pair cards are core, not the kickers
+            PairChecker.identifyPairCoreCards(usedCards, coreCards);
         } else {
-            findHighCard();
+            HighCardChecker.isHighCard(cards, usedCards);
             handType = "High Card";
             points = HIGH_CARD_POINTS;
+            // The single high card is core
+            coreCards.addAll(usedCards);
         }
     }
 
-    private void findHighCard() {
-        List<Card> sortedCards = cards.stream()
-                .sorted((c1, c2) -> c2.getValue().getNumericValue() - c1.getValue().getNumericValue())
-                .toList();
-
-        usedCards.addAll(sortedCards.subList(0, Math.min(5, sortedCards.size())));
-    }
-
-    private Map<CardValue, Integer> getValueCounts() {
-        Map<CardValue, Integer> valueCounts = new HashMap<>();
-        for (Card card : cards) {
-            valueCounts.put(card.getValue(), valueCounts.getOrDefault(card.getValue(), 0) + 1);
-        }
-        return valueCounts;
-    }
-
-
+    /**
+     * Gets the type of hand (e.g., "Pair", "Flush").
+     *
+     * @return The hand type
+     */
     public String getHandType() {
         return handType;
     }
 
+    /**
+     * Gets the base points for this hand type.
+     *
+     * @return The base points
+     */
     public int getPoints() {
         return points;
     }
 
+    /**
+     * Gets all cards that were used in the hand, including kickers.
+     *
+     * @return All used cards
+     */
     public Set<Card> getUsedCards() {
         return Collections.unmodifiableSet(usedCards);
     }
 
-    public int calculateTotalPoints() {
-        int totalPoints = points;
-
-        for (Card card : usedCards) {
-            totalPoints += card.getValue().getNumericValue();
-        }
-
-        return totalPoints;
+    /**
+     * Gets only the core cards that form the hand combination, not including kickers.
+     *
+     * @return The core cards
+     */
+    public Set<Card> getCoreCards() {
+        return Collections.unmodifiableSet(coreCards);
     }
 
     @Override
     public String toString() {
-        return handType + " (" + points + " base points, " + calculateTotalPoints() + " total points)";
+        return handType + " (" + points + " base points";
     }
 }

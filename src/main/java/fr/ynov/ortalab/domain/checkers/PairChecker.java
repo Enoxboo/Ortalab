@@ -30,4 +30,30 @@ public class PairChecker {
 
         return false;
     }
+
+    public static void identifyPairCoreCards(Set<Card> usedCards, Set<Card> coreCards) {
+        // Group the used cards by value
+        CardValue pairValue = null;
+        for (Card card : usedCards) {
+            int sameValueCount = 0;
+            for (Card other : usedCards) {
+                if (card.getValue() == other.getValue()) {
+                    sameValueCount++;
+                }
+            }
+            if (sameValueCount == 2) {
+                pairValue = card.getValue();
+                break;
+            }
+        }
+
+        // Add only the pair cards to the core cards
+        if (pairValue != null) {
+            for (Card card : usedCards) {
+                if (card.getValue() == pairValue) {
+                    coreCards.add(card);
+                }
+            }
+        }
+    }
 }

@@ -28,4 +28,31 @@ public class FourOfAKindChecker {
 
         return false;
     }
+
+    public static void identifyFourOfAKindCoreCards(Set<Card> usedCards, Set<Card> coreCards) {
+        // Group the used cards by value
+        CardValue fourOfAKindValue = null;
+        for (Card card : usedCards) {
+            int sameValueCount = 0;
+            for (Card other : usedCards) {
+                if (card.getValue() == other.getValue()) {
+                    sameValueCount++;
+                }
+            }
+            if (sameValueCount == 4) {
+                fourOfAKindValue = card.getValue();
+                break;
+            }
+        }
+
+        // Add only the four matching cards to the core cards
+        if (fourOfAKindValue != null) {
+            for (Card card : usedCards) {
+                if (card.getValue() == fourOfAKindValue) {
+                    coreCards.add(card);
+                }
+            }
+        }
+    }
+
 }

@@ -38,4 +38,17 @@ public class TwoPairsChecker {
 
         return true;
     }
+
+    public static void identifyTwoPairCoreCards(Set<Card> usedCards, Set<Card> coreCards) {
+        // Find the two pair values
+        for (Card card : usedCards) {
+            for (Card other : usedCards) {
+                if (card != other && card.getValue() == other.getValue()) {
+                    coreCards.add(card);
+                    coreCards.add(other);
+                    break;
+                }
+            }
+        }
+    }
 }

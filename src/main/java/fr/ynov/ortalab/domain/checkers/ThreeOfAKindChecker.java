@@ -31,4 +31,30 @@ public class ThreeOfAKindChecker {
         return false;
     }
 
+
+    public static void identifyThreeOfAKindCoreCards(Set<Card> usedCards, Set<Card> coreCards) {
+        // Group the used cards by value
+        CardValue threeOfAKindValue = null;
+        for (Card card : usedCards) {
+            int sameValueCount = 0;
+            for (Card other : usedCards) {
+                if (card.getValue() == other.getValue()) {
+                    sameValueCount++;
+                }
+            }
+            if (sameValueCount == 3) {
+                threeOfAKindValue = card.getValue();
+                break;
+            }
+        }
+
+        // Add only the three matching cards to the core cards
+        if (threeOfAKindValue != null) {
+            for (Card card : usedCards) {
+                if (card.getValue() == threeOfAKindValue) {
+                    coreCards.add(card);
+                }
+            }
+        }
+    }
 }
