@@ -2,12 +2,14 @@ package main.java.fr.ynov.ortalab.domain.checkers;
 
 import main.java.fr.ynov.ortalab.domain.Card;
 import main.java.fr.ynov.ortalab.domain.CardValue;
+import main.java.fr.ynov.ortalab.domain.HandType;
 
 import java.util.*;
 import java.util.stream.Collectors;
 
-public class TwoPairsChecker {
-    public static boolean isTwoPair(List<Card> cards, Set<Card> usedCards) {
+public class TwoPairsChecker implements HandChecker {
+    @Override
+    public boolean checkHand(List<Card> cards, Set<Card> usedCards, Set<Card> coreCards) {
         Map<CardValue, List<Card>> valueGroups = cards.stream()
                 .collect(Collectors.groupingBy(Card::getValue));
 
@@ -28,27 +30,27 @@ public class TwoPairsChecker {
         CardValue firstPairValue = pairValues.get(0);
         CardValue secondPairValue = pairValues.get(1);
 
-        usedCards.addAll(valueGroups.get(firstPairValue).subList(0, 2));
+        List<Card> firstPairCards = valueGroups.get(firstPairValue).subList(0, 2);
+        List<Card> secondPairCards = valueGroups.get(secondPairValue).subList(0, 2);
 
-        usedCards.addAll(valueGroups.get(secondPairValue).subList(0, 2));
+        // Add the pairs to both used and core cards
+        usedCards.addAll(firstPairCards);
+        usedCards.addAll(secondPairCards);
 
+        coreCards.addAll(firstPairCards);
+        coreCards.addAll(secondPairCards);
+
+        // Add the kicker to used cards only
         cards.stream()
                 .filter(card -> card.getValue() != firstPairValue && card.getValue() != secondPairValue)
-                .max(Comparator.comparingInt(card -> card.getValue().getNumericValue())).ifPresent(usedCards::add);
+                .max(Comparator.comparingInt(card -> card.getValue().getNumericValue()))
+                .ifPresent(usedCards::add);
 
         return true;
     }
 
-    public static void identifyTwoPairCoreCards(Set<Card> usedCards, Set<Card> coreCards) {
-        // Find the two pair values
-        for (Card card : usedCards) {
-            for (Card other : usedCards) {
-                if (card != other && card.getValue() == other.getValue()) {
-                    coreCards.add(card);
-                    coreCards.add(other);
-                    break;
-                }
-            }
-        }
+    @Override
+    public HandType getHandType() {
+        return HandType.TWO_PAIR;
     }
 }

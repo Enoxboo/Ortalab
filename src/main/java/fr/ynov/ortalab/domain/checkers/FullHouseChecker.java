@@ -2,6 +2,7 @@ package main.java.fr.ynov.ortalab.domain.checkers;
 
 import main.java.fr.ynov.ortalab.domain.Card;
 import main.java.fr.ynov.ortalab.domain.CardValue;
+import main.java.fr.ynov.ortalab.domain.HandType;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -9,8 +10,9 @@ import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-public class FullHouseChecker {
-    public static boolean isFullHouse(List<Card> cards, Set<Card> usedCards) {
+public class FullHouseChecker implements HandChecker {
+    @Override
+    public boolean checkHand(List<Card> cards, Set<Card> usedCards, Set<Card> coreCards) {
         Map<CardValue, List<Card>> valueGroups = cards.stream()
                 .collect(Collectors.groupingBy(Card::getValue));
 
@@ -35,9 +37,14 @@ public class FullHouseChecker {
             CardValue threesValue = threeOfAKindValues.get(0);
             CardValue pairValue = threeOfAKindValues.get(1);
 
-            usedCards.addAll(valueGroups.get(threesValue).subList(0, 3));
+            List<Card> threeCards = valueGroups.get(threesValue).subList(0, 3);
+            List<Card> pairCards = valueGroups.get(pairValue).subList(0, 2);
 
-            usedCards.addAll(valueGroups.get(pairValue).subList(0, 2));
+            usedCards.addAll(threeCards);
+            usedCards.addAll(pairCards);
+
+            coreCards.addAll(threeCards);
+            coreCards.addAll(pairCards);
 
             return true;
         }
@@ -51,10 +58,20 @@ public class FullHouseChecker {
         CardValue threesValue = threeOfAKindValues.getFirst();
         CardValue pairValue = pairValues.getFirst();
 
-        usedCards.addAll(valueGroups.get(threesValue).subList(0, 3));
+        List<Card> threeCards = valueGroups.get(threesValue).subList(0, 3);
+        List<Card> pairCards = valueGroups.get(pairValue).subList(0, 2);
 
-        usedCards.addAll(valueGroups.get(pairValue).subList(0, 2));
+        usedCards.addAll(threeCards);
+        usedCards.addAll(pairCards);
+
+        coreCards.addAll(threeCards);
+        coreCards.addAll(pairCards);
 
         return true;
+    }
+
+    @Override
+    public HandType getHandType() {
+        return HandType.FULL_HOUSE;
     }
 }

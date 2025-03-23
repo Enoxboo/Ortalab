@@ -3,8 +3,8 @@ package main.java.fr.ynov.ortalab.domain.checkers;
 import main.java.fr.ynov.ortalab.domain.Card;
 import main.java.fr.ynov.ortalab.domain.CardSuit;
 import main.java.fr.ynov.ortalab.domain.CardValue;
+import main.java.fr.ynov.ortalab.domain.HandType;
 import main.java.fr.ynov.ortalab.domain.utils.HandUtils;
-
 
 import java.util.Comparator;
 import java.util.List;
@@ -12,10 +12,10 @@ import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-public class StraightFlushChecker {
-    public static boolean isStraightFlush(List<Card> cards, Set<Card> usedCards) {
+public class StraightFlushChecker implements HandChecker {
+    @Override
+    public boolean checkHand(List<Card> cards, Set<Card> usedCards, Set<Card> coreCards) {
         List<Card> sortedCards = HandUtils.getSortedCards(cards);
-
 
         Map<CardSuit, List<Card>> suitGroups = cards.stream()
                 .collect(Collectors.groupingBy(Card::getSuit));
@@ -37,7 +37,9 @@ public class StraightFlushChecker {
                     }
 
                     if (isStraight) {
-                        usedCards.addAll(suitSorted.subList(i, i + 5));
+                        List<Card> straightFlushCards = suitSorted.subList(i, i + 5);
+                        usedCards.addAll(straightFlushCards);
+                        coreCards.addAll(straightFlushCards);
                         return true;
                     }
                 }
@@ -49,15 +51,18 @@ public class StraightFlushChecker {
                 boolean hasFive = suitGroup.stream().anyMatch(card -> card.getValue() == CardValue.FIVE);
 
                 if (hasAce && hasTwo && hasThree && hasFour && hasFive) {
+                    List<Card> lowStraightFlushCards = new java.util.ArrayList<>();
                     for (Card card : suitGroup) {
                         if (card.getValue() == CardValue.ACE ||
                                 card.getValue() == CardValue.TWO ||
                                 card.getValue() == CardValue.THREE ||
                                 card.getValue() == CardValue.FOUR ||
                                 card.getValue() == CardValue.FIVE) {
+                            lowStraightFlushCards.add(card);
                             usedCards.add(card);
                         }
                     }
+                    coreCards.addAll(lowStraightFlushCards);
                     return true;
                 }
             }
@@ -66,4 +71,8 @@ public class StraightFlushChecker {
         return false;
     }
 
+    @Override
+    public HandType getHandType() {
+        return HandType.STRAIGHT_FLUSH;
+    }
 }

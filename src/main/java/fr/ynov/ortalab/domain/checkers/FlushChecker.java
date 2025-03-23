@@ -2,14 +2,16 @@ package main.java.fr.ynov.ortalab.domain.checkers;
 
 import main.java.fr.ynov.ortalab.domain.Card;
 import main.java.fr.ynov.ortalab.domain.CardSuit;
+import main.java.fr.ynov.ortalab.domain.HandType;
 
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-public class FlushChecker {
-    public static boolean isFlush(List<Card> cards, Set<Card> usedCards) {
+public class FlushChecker implements HandChecker {
+    @Override
+    public boolean checkHand(List<Card> cards, Set<Card> usedCards, Set<Card> coreCards) {
         Map<CardSuit, List<Card>> suitGroups = cards.stream()
                 .collect(Collectors.groupingBy(Card::getSuit));
 
@@ -19,11 +21,18 @@ public class FlushChecker {
                         .sorted((c1, c2) -> c2.getValue().getNumericValue() - c1.getValue().getNumericValue())
                         .toList();
 
-                usedCards.addAll(flushCards.subList(0, 5));
+                List<Card> topFiveCards = flushCards.subList(0, 5);
+                usedCards.addAll(topFiveCards);
+                coreCards.addAll(topFiveCards);
                 return true;
             }
         }
 
         return false;
+    }
+
+    @Override
+    public HandType getHandType() {
+        return HandType.FLUSH;
     }
 }

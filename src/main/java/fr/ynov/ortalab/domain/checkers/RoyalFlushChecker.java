@@ -3,63 +3,55 @@ package main.java.fr.ynov.ortalab.domain.checkers;
 import main.java.fr.ynov.ortalab.domain.Card;
 import main.java.fr.ynov.ortalab.domain.CardSuit;
 import main.java.fr.ynov.ortalab.domain.CardValue;
+import main.java.fr.ynov.ortalab.domain.HandType;
 import main.java.fr.ynov.ortalab.domain.utils.HandUtils;
-
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-public class RoyalFlushChecker {
-    public static boolean isRoyalFlush(List<Card> cards, Set<Card> usedCards) {
+public class RoyalFlushChecker implements HandChecker {
+    @Override
+    public boolean checkHand(List<Card> cards, Set<Card> usedCards, Set<Card> coreCards) {
         List<Card> sortedCards = HandUtils.getSortedCards(cards);
 
-        CardSuit suit = sortedCards.getFirst().getSuit();
-        boolean isFlush = sortedCards.stream().allMatch(card -> card.getSuit() == suit);
+        // Group cards by suit
+        for (CardSuit suit : CardSuit.values()) {
+            List<Card> sameSuitCards = sortedCards.stream()
+                    .filter(card -> card.getSuit() == suit)
+                    .collect(Collectors.toList());
 
-        if (!isFlush) {
-            return false;
-        }
-
-        boolean isRoyal = false;
-        List<Card> royalCards = new ArrayList<>();
-
-        for (Card card : sortedCards) {
-            if (card.getValue() == CardValue.TEN ||
-                    card.getValue() == CardValue.JACK ||
-                    card.getValue() == CardValue.QUEEN ||
-                    card.getValue() == CardValue.KING ||
-                    card.getValue() == CardValue.ACE) {
-                royalCards.add(card);
+            if (sameSuitCards.size() < 5) {
+                continue;
             }
-        }
 
-        if (royalCards.size() >= 5) {
-            Set<CardValue> values = royalCards.stream()
-                    .map(Card::getValue)
-                    .collect(Collectors.toSet());
+            boolean hasTen = false, hasJack = false, hasQueen = false,
+                    hasKing = false, hasAce = false;
+            List<Card> royalCards = new ArrayList<>();
 
-            isRoyal = values.contains(CardValue.TEN) &&
-                    values.contains(CardValue.JACK) &&
-                    values.contains(CardValue.QUEEN) &&
-                    values.contains(CardValue.KING) &&
-                    values.contains(CardValue.ACE);
-
-            if (isRoyal) {
-                for (Card card : royalCards) {
-                    if (card.getValue() == CardValue.TEN ||
-                            card.getValue() == CardValue.JACK ||
-                            card.getValue() == CardValue.QUEEN ||
-                            card.getValue() == CardValue.KING ||
-                            card.getValue() == CardValue.ACE) {
-                        usedCards.add(card);
-                        if (usedCards.size() == 5) break;
-                    }
+            for (Card card : sameSuitCards) {
+                switch (card.getValue()) {
+                    case TEN -> { hasTen = true; royalCards.add(card); }
+                    case JACK -> { hasJack = true; royalCards.add(card); }
+                    case QUEEN -> { hasQueen = true; royalCards.add(card); }
+                    case KING -> { hasKing = true; royalCards.add(card); }
+                    case ACE -> { hasAce = true; royalCards.add(card); }
                 }
             }
+
+            if (hasTen && hasJack && hasQueen && hasKing && hasAce) {
+                usedCards.addAll(royalCards);
+                coreCards.addAll(royalCards);
+                return true;
+            }
         }
 
-        return isRoyal;
+        return false;
+    }
+
+    @Override
+    public HandType getHandType() {
+        return HandType.ROYAL_FLUSH;
     }
 }
