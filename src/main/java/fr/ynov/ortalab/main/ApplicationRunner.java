@@ -1,163 +1,169 @@
 package main.java.fr.ynov.ortalab.main;
 
 import main.java.fr.ynov.ortalab.domain.Card;
-import main.java.fr.ynov.ortalab.domain.CardSuit;
-import main.java.fr.ynov.ortalab.domain.CardValue;
-import main.java.fr.ynov.ortalab.domain.PointsCalculator;
+import main.java.fr.ynov.ortalab.domain.game.GameManager;
+import main.java.fr.ynov.ortalab.domain.game.Player;
+import main.java.fr.ynov.ortalab.domain.game.Enemy;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
 
-/**
- * Example class to demonstrate the poker hand evaluation and scoring
- * with the added discard mechanic.
- */
 public class ApplicationRunner {
+    private static GameManager gameManager;
+    private static Scanner scanner;
+
     public static void main(String[] args) {
-        // Create a sample hand
-        List<Card> playerHand = createSampleHand();
-        playRound(playerHand);
+        gameManager = new GameManager();
+        scanner = new Scanner(System.in);
+
+        // Start the first encounter
+        gameManager.startEncounter();
+
+        // Main game loop
+        while (true) {
+            // Display game state
+            displayGameStatus();
+
+            // Player's turn to select cards
+            List<Card> selectedCards = selectCards();
+
+            // Prompt for action
+            System.out.println("\nChoose an action:");
+            System.out.println("1. Play selected cards");
+            System.out.println("2. Discard selected cards");
+
+            int choice = promptForChoice(1, 2);
+
+            if (choice == 1) {
+                // Play the selected cards
+                playSelectedCards(selectedCards);
+            } else {
+                // Discard the selected cards
+                discardSelectedCards(selectedCards);
+            }
+
+            // Check for game-ending conditions
+            if (isGameOver()) {
+                break;
+            }
+        }
+
+        // Close scanner
+        scanner.close();
     }
 
     /**
-     * Plays one round of the game with the given hand.
-     *
-     * @param playerHand The player's hand
+     * Display current game status
      */
-    private static void playRound(List<Card> playerHand) {
-        Scanner scanner = new Scanner(System.in);
+    private static void displayGameStatus() {
+        Player player = gameManager.getPlayer();
+        Enemy enemy = gameManager.getCurrentEnemy();
 
-        // Display the player's hand
-        displayHand(playerHand, "Your hand:");
+        // Player information
+        System.out.println("\n--- Player Status ---");
+        System.out.println("HP: " + player.getHealthPoints() + "/" + player.getMaxHealthPoints());
+        System.out.println("Discards left: " + player.getRemainingDiscards());
 
-        // Let the player select cards
-        System.out.println("\nSelect cards to play or discard (enter card numbers separated by spaces):");
-        List<Card> selectedCards = selectCardsInteractive(playerHand);
+        // Enemy information
+        System.out.println("\n--- Enemy Status ---");
+        System.out.println("HP: " + enemy.getHealthPoints());
+        System.out.println("Attack Damage: " + enemy.getAttackDamage());
+        System.out.println("Attack Cooldown: " + enemy.getCurrentCooldown());
 
-        if (selectedCards.isEmpty()) {
-            System.out.println("No cards selected. Please select at least one card.");
-            return;
-        }
-
-        // Ask the player what they want to do with the selected cards
-        System.out.println("\nYou've selected these cards:");
-        displaySelectedCards(selectedCards);
-
-        System.out.println("\nWhat would you like to do?");
-        System.out.println("1. Play these cards");
-        System.out.println("2. Discard these cards and draw new ones");
-
-        int choice = promptForChoice(scanner, 1, 2);
-
-        if (choice == 1) {
-            // Play the selected cards
-            playSelectedCards(selectedCards);
-        } else {
-            // Discard the selected cards and draw new ones
-            discardAndDraw(playerHand, selectedCards);
+        // Display current hand
+        System.out.println("\n--- Your Hand ---");
+        List<Card> currentHand = player.getCurrentHand();
+        for (int i = 0; i < currentHand.size(); i++) {
+            System.out.println((i + 1) + ". " + currentHand.get(i).toShortString());
         }
     }
 
     /**
-     * Plays the selected cards and shows the score.
-     *
-     * @param selectedCards The cards to play
+     * Select cards from the current hand
+     */
+    private static List<Card> selectCards() {
+        Player player = gameManager.getPlayer();
+        List<Card> currentHand = player.getCurrentHand();
+        List<Card> selectedCards = new ArrayList<>();
+
+        while (true) {
+            System.out.println("\nSelect cards (1-5) to play or discard. Enter 0 to finish selection.");
+            int cardIndex = promptForChoice(0, currentHand.size());
+
+            if (cardIndex == 0) {
+                if (selectedCards.isEmpty()) {
+                    System.out.println("You must select at least one card.");
+                    continue;
+                }
+                break;
+            }
+
+            Card selectedCard = currentHand.get(cardIndex - 1);
+            if (selectedCards.contains(selectedCard)) {
+                System.out.println("You've already selected this card.");
+                continue;
+            }
+
+            selectedCards.add(selectedCard);
+
+            if (selectedCards.size() == 5) {
+                break;
+            }
+        }
+
+        return selectedCards;
+    }
+
+    /**
+     * Play selected cards against the enemy
      */
     private static void playSelectedCards(List<Card> selectedCards) {
-        System.out.println("\nPlaying selected cards...");
-        System.out.println("\nScore breakdown:");
-        System.out.println(PointsCalculator.getScoreBreakdown(selectedCards));
-    }
-
-    /**
-     * Discards the selected cards and draws replacements.
-     *
-     * @param playerHand The player's hand
-     * @param selectedCards The cards to discard
-     */
-    private static void discardAndDraw(List<Card> playerHand, List<Card> selectedCards) {
-        System.out.println("\nDiscarding selected cards and drawing new ones...");
-
-        // Remove selected cards from player's hand
-        playerHand.removeAll(selectedCards);
-
-        // Draw new cards (in a real game, this would draw from a deck)
-        for (int i = 0; i < selectedCards.size(); i++) {
-            playerHand.add(createRandomCard());
-        }
-
-        // Show the new hand
-        displayHand(playerHand, "\nYour new hand:");
-
-        // Continue with the new hand
-        playRound(playerHand);
-    }
-
-    /**
-     * Creates a sample hand of 5 cards.
-     *
-     * @return A list of 5 cards
-     */
-    private static List<Card> createSampleHand() {
-        List<Card> hand = new ArrayList<>();
-        hand.add(new Card(CardValue.ACE, CardSuit.HEARTS));
-        hand.add(new Card(CardValue.TEN, CardSuit.CLUBS));
-        hand.add(new Card(CardValue.TEN, CardSuit.DIAMONDS));
-        hand.add(new Card(CardValue.TEN, CardSuit.SPADES));
-        hand.add(new Card(CardValue.TEN, CardSuit.HEARTS));
-        return hand;
-    }
-
-    /**
-     * Creates a random card for demonstration purposes.
-     * In a real game, this would draw from a deck.
-     *
-     * @return A random card
-     */
-    private static Card createRandomCard() {
-        CardValue[] values = CardValue.values();
-        CardSuit[] suits = CardSuit.values();
-
-        CardValue value = values[(int)(Math.random() * values.length)];
-        CardSuit suit = suits[(int)(Math.random() * suits.length)];
-
-        return new Card(value, suit);
-    }
-
-    /**
-     * Displays the player's hand.
-     *
-     * @param hand The hand to display
-     * @param title The title to show above the hand
-     */
-    private static void displayHand(List<Card> hand, String title) {
-        System.out.println(title);
-        for (int i = 0; i < hand.size(); i++) {
-            System.out.println((i + 1) + ". " + hand.get(i).toShortString() + " (" + hand.get(i) + ")");
+        try {
+            // Select the hand and process combat
+            gameManager.selectHand(selectedCards);
+            System.out.println("Cards played successfully!");
+        } catch (Exception e) {
+            System.out.println("Error playing cards: " + e.getMessage());
         }
     }
 
     /**
-     * Displays only the selected cards.
-     *
-     * @param selectedCards The selected cards to display
+     * Discard selected cards
      */
-    private static void displaySelectedCards(List<Card> selectedCards) {
-        for (Card card : selectedCards) {
-            System.out.println(card.toShortString() + " (" + card + ")");
+    private static void discardSelectedCards(List<Card> selectedCards) {
+        try {
+            // Perform discard
+            gameManager.playerDiscard(selectedCards);
+            System.out.println("Cards discarded successfully!");
+        } catch (Exception e) {
+            System.out.println("Error discarding cards: " + e.getMessage());
         }
     }
 
     /**
-     * Prompts the user for a choice between min and max (inclusive).
-     *
-     * @param scanner The scanner to use for input
-     * @param min The minimum valid choice
-     * @param max The maximum valid choice
-     * @return The user's choice
+     * Check if the game is over
      */
-    private static int promptForChoice(Scanner scanner, int min, int max) {
+    private static boolean isGameOver() {
+        GameManager.GameState gameState = gameManager.getGameState();
+
+        if (gameState == GameManager.GameState.GAME_OVER) {
+            System.out.println("Game Over! You were defeated.");
+            return true;
+        }
+
+        if (gameState == GameManager.GameState.VICTORY) {
+            System.out.println("Congratulations! You've won the game!");
+            return true;
+        }
+
+        return false;
+    }
+
+    /**
+     * Prompt for a choice between min and max (inclusive)
+     */
+    private static int promptForChoice(int min, int max) {
         int choice = -1;
         while (choice < min || choice > max) {
             System.out.print("Enter your choice (" + min + "-" + max + "): ");
@@ -171,36 +177,5 @@ public class ApplicationRunner {
             }
         }
         return choice;
-    }
-
-    /**
-     * Lets the player select cards using console input.
-     *
-     * @param playerHand The player's hand
-     * @return The selected cards
-     */
-    private static List<Card> selectCardsInteractive(List<Card> playerHand) {
-        Scanner scanner = new Scanner(System.in);
-        List<Card> selectedCards = new ArrayList<>();
-
-        String input = scanner.nextLine().trim();
-        if (input.isEmpty()) {
-            return selectedCards;
-        }
-
-        String[] selections = input.split("\\s+");
-        for (String selection : selections) {
-            try {
-                int index = Integer.parseInt(selection) - 1;
-                if (index >= 0 && index < playerHand.size() &&
-                        !selectedCards.contains(playerHand.get(index))) {
-                    selectedCards.add(playerHand.get(index));
-                }
-            } catch (NumberFormatException e) {
-                // Ignore invalid input
-            }
-        }
-
-        return selectedCards;
     }
 }
