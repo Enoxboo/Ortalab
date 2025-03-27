@@ -1,28 +1,29 @@
 package main.java.fr.ynov.ortalab.gui.frames;
 
-import main.java.fr.ynov.ortalab.domain.Card;
-import main.java.fr.ynov.ortalab.domain.game.GameManager;
+import main.java.fr.ynov.ortalab.domain.game.managers.GameManager;
 import main.java.fr.ynov.ortalab.domain.game.Enemy;
 import main.java.fr.ynov.ortalab.domain.game.Player;
 import main.java.fr.ynov.ortalab.gui.panels.*;
+import main.java.fr.ynov.ortalab.domain.PointsCalculator;
 
 import javax.swing.*;
 import java.awt.*;
-import java.util.List;
 
 public class MainGameFrame extends JFrame {
     private final GameManager gameManager;
     private HandPanel handPanel;
     private ButtonPanel buttonPanel;
-    private StatusPanel statusPanel;
+    private StatusPanel playerStatusPanel;
+    private StatusPanel enemyStatusPanel;
     private SortButtonPanel sortButtonPanel;
+    private JLabel currentHandPointsLabel;
 
     public MainGameFrame(GameManager gameManager) {
         this.gameManager = gameManager;
 
         // Set fixed size and prevent resizing
         int frameWidth = 1200;
-        int frameHeight = 700;
+        int frameHeight = 675;
 
         setTitle("Ortolab");
         setSize(frameWidth, frameHeight);
@@ -42,10 +43,12 @@ public class MainGameFrame extends JFrame {
         // Initialize game components
         initializeGameComponents();
 
-        // Create bottom panel to contain game elements
-        JPanel bottomPanel = createBottomPanel();
+        // Create status panel container
+        JPanel statusPanel = createStatusPanel();
+        add(statusPanel, BorderLayout.CENTER);
 
-        // Add bottom panel to the main frame
+        // Create bottom panel for game elements
+        JPanel bottomPanel = createBottomPanel();
         add(bottomPanel, BorderLayout.SOUTH);
     }
 
@@ -53,17 +56,41 @@ public class MainGameFrame extends JFrame {
         Player player = gameManager.getPlayer();
         Enemy enemy = gameManager.getCurrentEnemy();
 
-        // Create status panel to show game state
-        statusPanel = new StatusPanel(player, enemy, gameManager.getCurrentLevel());
+        // Create separate status panels for player and enemy
+        playerStatusPanel = new StatusPanel(player, enemy, gameManager.getCurrentLevel(), true);
+        enemyStatusPanel = new StatusPanel(player, enemy, gameManager.getCurrentLevel(), false);
 
         // Create hand panel with initial hand
-        handPanel = new HandPanel(player.getCurrentHand());
+        handPanel = new HandPanel(player.getCurrentHand(), gameManager);
+
+        // Create current hand points label
+        currentHandPointsLabel = new JLabel("Damages : 0", SwingConstants.CENTER);
+        currentHandPointsLabel.setFont(new Font("Arial", Font.BOLD, 16));
 
         // Create sort button panel
         sortButtonPanel = new SortButtonPanel(handPanel);
 
         // Create button panel with game actions
-        buttonPanel = new ButtonPanel(gameManager, handPanel, statusPanel);
+        buttonPanel = new ButtonPanel(
+                gameManager,
+                handPanel,
+                playerStatusPanel,
+                enemyStatusPanel,
+                currentHandPointsLabel
+        );
+    }
+
+    private JPanel createStatusPanel() {
+        // Create a panel to split status panels
+        JPanel statusContainer = new JPanel(new GridLayout(1, 2, 10, 0));
+        statusContainer.add(playerStatusPanel);
+        statusContainer.add(enemyStatusPanel);
+
+        // Make status panels larger and non-scrollable
+        playerStatusPanel.setRows(15);
+        enemyStatusPanel.setRows(15);
+
+        return statusContainer;
     }
 
     private JPanel createBottomPanel() {
@@ -78,20 +105,18 @@ public class MainGameFrame extends JFrame {
         handPanel.setLayout(new FlowLayout(FlowLayout.CENTER, 10, 10));
         handContainer.add(new JScrollPane(handPanel), BorderLayout.CENTER);
 
-        // Add hand container to top of bottom panel
-        bottomPanel.add(handContainer, BorderLayout.NORTH);
-
-        // Create a panel for buttons and status
+        // Create a panel for buttons and damages
         JPanel actionPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 20, 10));
 
-        // Add game buttons
+        // Add game buttons and damages preview
         JButton discardButton = buttonPanel.getDiscardButton();
         JButton playButton = buttonPanel.getPlayCardsButton();
         actionPanel.add(discardButton);
-        actionPanel.add(new JScrollPane(statusPanel));
+        actionPanel.add(currentHandPointsLabel);
         actionPanel.add(playButton);
 
-        // Add action panel to bottom of bottom panel
+        // Combine hand container and action panel
+        bottomPanel.add(handContainer, BorderLayout.CENTER);
         bottomPanel.add(actionPanel, BorderLayout.SOUTH);
 
         return bottomPanel;

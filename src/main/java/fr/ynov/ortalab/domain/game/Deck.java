@@ -6,42 +6,59 @@ import main.java.fr.ynov.ortalab.domain.CardValue;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 public class Deck {
-    private List<Card> cards;
+    private List<Card> originalCards;
+    private List<Card> availableCards;
+    private Set<Card> usedCards;
 
     /**
      * Create a standard 52-card deck
      */
     public Deck() {
-        cards = new ArrayList<>();
+        originalCards = new ArrayList<>();
         for (CardSuit suit : CardSuit.values()) {
             for (CardValue value : CardValue.values()) {
-                cards.add(new Card(value, suit));
+                originalCards.add(new Card(value, suit));
             }
         }
-        shuffle();
+        reset();
     }
 
     /**
-     * Shuffle the deck
+     * Shuffle the available cards
      */
     public void shuffle() {
-        Collections.shuffle(cards);
+        Collections.shuffle(availableCards);
     }
 
     /**
-     * Draw a card from the deck
+     * Draw a card from the available cards
      *
      * @return The drawn card
-     * @throws IllegalStateException if deck is empty
+     * @throws IllegalStateException if no cards are available
      */
     public Card drawCard() {
-        if (cards.isEmpty()) {
+        if (availableCards.isEmpty()) {
             throw new IllegalStateException("No cards left in the deck");
         }
-        return cards.remove(cards.size() - 1);
+        Card drawnCard = availableCards.remove(availableCards.size() - 1);
+        usedCards.add(drawnCard);
+        return drawnCard;
+    }
+
+    /**
+     * Add a card back to the available cards (if not already used)
+     *
+     * @param card The card to be returned to the deck
+     */
+    public void returnCard(Card card) {
+        if (!usedCards.contains(card) && !availableCards.contains(card)) {
+            availableCards.add(card);
+        }
     }
 
     /**
@@ -50,7 +67,7 @@ public class Deck {
      * @return Remaining card count
      */
     public int getRemainingCards() {
-        return cards.size();
+        return availableCards.size();
     }
 
     /**
@@ -59,19 +76,47 @@ public class Deck {
      * @return true if no cards remain, false otherwise
      */
     public boolean isEmpty() {
-        return cards.isEmpty();
+        return availableCards.isEmpty();
     }
 
     /**
-     * Reset and reshuffle the deck
+     * Reset and reshuffle the deck, clearing used cards
      */
     public void reset() {
-        cards.clear();
-        for (CardSuit suit : CardSuit.values()) {
-            for (CardValue value : CardValue.values()) {
-                cards.add(new Card(value, suit));
+        availableCards = new ArrayList<>(originalCards);
+        usedCards = new HashSet<>();
+        shuffle();
+    }
+
+    /**
+     * Get a list of unique cards to replace discarded or played cards
+     *
+     * @param count Number of unique cards to draw
+     * @return List of unique cards
+     */
+    public List<Card> drawUniqueCards(int count) {
+        List<Card> uniqueCards = new ArrayList<>();
+        Set<Card> drawnCards = new HashSet<>();
+
+        // Reset the deck if it's empty
+        if (availableCards.isEmpty()) {
+            reset();
+        }
+
+        while (uniqueCards.size() < count && !availableCards.isEmpty()) {
+            Card card = drawCard();
+            if (!drawnCards.contains(card)) {
+                uniqueCards.add(card);
+                drawnCards.add(card);
             }
         }
-        shuffle();
+
+        // If still not enough unique cards, add non-unique cards
+        while (uniqueCards.size() < count) {
+            Card card = drawCard();
+            uniqueCards.add(card);
+        }
+
+        return uniqueCards;
     }
 }

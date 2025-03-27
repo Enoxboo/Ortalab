@@ -10,8 +10,7 @@ public class Enemy {
     private int attackCooldown;
     private int currentCooldown;
 
-    // Enemy passive effect
-    private EnemyPassive passive;
+
 
     /**
      * Constructor for a standard enemy
@@ -19,15 +18,13 @@ public class Enemy {
      * @param hp Total health points
      * @param damage Base attack damage
      * @param cooldown Turns between attacks
-     * @param passive Special passive ability
      */
-    public Enemy(int hp, int damage, int cooldown, EnemyPassive passive) {
+    public Enemy(int hp, int damage, int cooldown) {
         this.healthPoints = hp;
         this.maxHealthPoints = hp;
         this.attackDamage = damage;
         this.attackCooldown = cooldown;
         this.currentCooldown = cooldown;
-        this.passive = passive;
     }
 
     /**
@@ -38,11 +35,6 @@ public class Enemy {
      * @return Remaining health points
      */
     public int takeDamage(int damage, Object selectedHand) {
-        // Apply passive effects if they modify incoming damage
-        if (passive != null) {
-            damage = passive.modifyIncomingDamage(damage, selectedHand);
-        }
-
         this.healthPoints = Math.max(0, this.healthPoints - damage);
         return this.healthPoints;
     }
@@ -101,27 +93,4 @@ public class Enemy {
         return currentCooldown;
     }
 
-    /**
-     * Interface for enemy passive abilities
-     */
-    public interface EnemyPassive {
-        /**
-         * Modify incoming damage based on specific conditions
-         *
-         * @param originalDamage Initial damage amount
-         * @param context Additional context (e.g., player's hand)
-         * @return Modified damage amount
-         */
-        int modifyIncomingDamage(int originalDamage, Object context);
-    }
-
-    // Example implementation of a passive
-    public static class PairDamageReductionPassive implements EnemyPassive {
-        @Override
-        public int modifyIncomingDamage(int originalDamage, Object context) {
-            // Reduce damage by 50% if player's hand contains a pair
-            // This is a placeholder implementation - you'll need to add actual hand checking logic
-            return originalDamage / 2;
-        }
-    }
 }

@@ -1,34 +1,36 @@
 package main.java.fr.ynov.ortalab.gui.panels;
 
 import main.java.fr.ynov.ortalab.domain.Card;
-import main.java.fr.ynov.ortalab.domain.game.GameManager;
+import main.java.fr.ynov.ortalab.domain.game.managers.GameManager;
 import main.java.fr.ynov.ortalab.gui.buttons.CardButton;
-import main.java.fr.ynov.ortalab.domain.utils.CardSorter;
 
 import javax.swing.*;
 import java.awt.*;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.function.Consumer;
 
 public class HandPanel extends JPanel {
     private static final int MAX_HAND_SIZE = 8;
     private final List<Card> playerHand;
     private final List<CardButton> cardButtons;
+    private final GameManager gameManager;
     private SortType currentSortType = SortType.VALUE;
+    private final List<Runnable> selectionListeners = new ArrayList<>();
 
-    // Enum to track current sorting type
     public enum SortType {
         VALUE,
         SUIT
     }
 
-    public HandPanel(List<Card> initialHand) {
+    public HandPanel(List<Card> initialHand, GameManager gameManager) {
+        this.gameManager = gameManager;
         this.playerHand = new ArrayList<>(validateInitialHand(initialHand));
         this.cardButtons = new ArrayList<>(MAX_HAND_SIZE);
 
         configureLayout();
-        initializeHand();
+        sortHand(currentSortType);
     }
 
     private List<Card> validateInitialHand(List<Card> hand) {
@@ -36,16 +38,20 @@ public class HandPanel extends JPanel {
             return generateNewHand();
         }
 
-        // Ensure exactly 8 cards
+        // Ensure exactly 8 cards using the deck
         while (hand.size() < MAX_HAND_SIZE) {
-            hand.add(GameManager.createRandomCard());
+            hand.add(gameManager.getDeck().drawCard());
         }
 
         return hand.subList(0, MAX_HAND_SIZE);
     }
 
     private List<Card> generateNewHand() {
-        return GameManager.generateInitialHand();
+        List<Card> newHand = new ArrayList<>();
+        for (int i = 0; i < MAX_HAND_SIZE; i++) {
+            newHand.add(gameManager.getDeck().drawCard());
+        }
+        return newHand;
     }
 
     private void configureLayout() {
@@ -63,6 +69,12 @@ public class HandPanel extends JPanel {
 
     private void addCardButton(Card card) {
         CardButton cardButton = new CardButton(card);
+        cardButton.addActionListener(e -> {
+            for (Runnable listener : selectionListeners) {
+                listener.run();
+            }
+        });
+
         cardButtons.add(cardButton);
         add(cardButton);
     }
@@ -75,14 +87,15 @@ public class HandPanel extends JPanel {
     }
 
     public void removeCards(List<Card> cardsToRemove) {
+        // Remove selected cards from hand
         playerHand.removeAll(cardsToRemove);
-        playerHand.addAll(
-                Collections.nCopies(
-                        cardsToRemove.size(),
-                        GameManager.createRandomCard()
-                )
-        );
-        initializeHand();
+
+        // Draw unique replacement cards from the deck
+        List<Card> newCards = gameManager.getDeck().drawUniqueCards(cardsToRemove.size());
+        playerHand.addAll(newCards);
+
+        // Re-sort the hand based on current sort type
+        sortHand(currentSortType);
     }
 
     public List<Card> getPlayerHand() {
@@ -110,6 +123,10 @@ public class HandPanel extends JPanel {
 
         // Refresh the hand display
         initializeHand();
+    }
+
+    public void addCardSelectionListener(Runnable listener) {
+        selectionListeners.add(listener);
     }
 
     public SortType getCurrentSortType() {

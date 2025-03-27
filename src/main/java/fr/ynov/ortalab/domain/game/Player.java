@@ -7,14 +7,15 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class Player {
-    // Player base attributes
     private int healthPoints;
     private int maxHealthPoints;
     private int gold;
     private int discardCount;
+    private int totalDiscardCount;
     private final int MAX_DISCARDS = 3;
     private final int MAX_HAND_SIZE = 8;
     private final int ACTIVE_HAND_SIZE = 5;
+    private final int MAX_DISCARDS_PER_ENEMY = 3;
 
     // Inventory and modifiers
     private List<Item> inventory;
@@ -32,6 +33,7 @@ public class Player {
         this.maxHealthPoints = initialHP;
         this.gold = 0;
         this.discardCount = 0;
+        this.totalDiscardCount = 0;
         this.criticalChance = 5; // Base 5% critical chance
         this.inventory = new ArrayList<>();
         this.currentHand = new ArrayList<>();
@@ -100,8 +102,8 @@ public class Player {
      * @throws IllegalStateException if discard limit is reached
      */
     public void discard(List<Card> cardsToDiscard, Deck deck) {
-        if (discardCount >= MAX_DISCARDS) {
-            throw new IllegalStateException("Maximum discards reached");
+        if (discardCount >= MAX_DISCARDS_PER_ENEMY) {
+            throw new IllegalStateException("Maximum discards for this enemy reached");
         }
 
         // Remove discarded cards from current hand
@@ -113,6 +115,11 @@ public class Player {
         }
 
         discardCount++;
+        totalDiscardCount++; // Increment total discard count
+    }
+
+    public void resetDiscards() {
+        this.discardCount = 0;
     }
 
     /**
@@ -129,6 +136,7 @@ public class Player {
         }
         return false;
     }
+
 
     /**
      * Sell an item from inventory
@@ -199,6 +207,18 @@ public class Player {
     }
 
     public int getRemainingDiscards() {
-        return MAX_DISCARDS - discardCount;
+        return MAX_DISCARDS_PER_ENEMY - discardCount;
+    }
+
+    public int getTotalDiscardCount() {
+        return totalDiscardCount;
+    }
+
+    public int getDiscardCount() {
+        return discardCount;
+    }
+
+    public void setDiscardCount(int count) {
+        this.discardCount = count;
     }
 }

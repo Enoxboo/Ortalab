@@ -6,8 +6,8 @@ package main.java.fr.ynov.ortalab.domain;
 public enum CardSuit {
     CLUBS("Clubs"),
     HEARTS("Hearts"),
-    DIAMONDS("Diamonds"),
-    SPADES("Spades");
+    SPADES("Spades"),
+    DIAMONDS("Diamonds");
 
     private final String name;
 

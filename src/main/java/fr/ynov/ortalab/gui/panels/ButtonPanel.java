@@ -1,27 +1,36 @@
 package main.java.fr.ynov.ortalab.gui.panels;
 
 import main.java.fr.ynov.ortalab.domain.Card;
-import main.java.fr.ynov.ortalab.domain.game.GameManager;
+import main.java.fr.ynov.ortalab.domain.PointsCalculator;
+import main.java.fr.ynov.ortalab.domain.game.managers.GameManager;
 
 import javax.swing.*;
 import java.util.List;
 
 public class ButtonPanel extends JPanel {
     private final GameManager gameManager;
+
     private final HandPanel handPanel;
-    private final StatusPanel statusPanel;
+    private final StatusPanel playerStatusPanel;
+    private final StatusPanel enemyStatusPanel;
+    private final JLabel currentHandPointsLabel;
     private final JButton playButton;
     private final JButton discardButton;
 
-    public ButtonPanel(GameManager gameManager, HandPanel handPanel, StatusPanel statusPanel) {
+    public ButtonPanel(GameManager gameManager, HandPanel handPanel, StatusPanel playerStatusPanel, StatusPanel enemyStatusPanel, JLabel currentHandPointsLabel) {
         this.gameManager = gameManager;
         this.handPanel = handPanel;
-        this.statusPanel = statusPanel;
+        this.playerStatusPanel = playerStatusPanel;
+        this.enemyStatusPanel = enemyStatusPanel;
+        this.currentHandPointsLabel = currentHandPointsLabel;
 
         setLayout(new BoxLayout(this, BoxLayout.X_AXIS));
 
         playButton = createPlayButton();
         discardButton = createDiscardButton();
+
+        // Add listener to update hand points when card selection changes
+        handPanel.addCardSelectionListener(this::updateHandPoints);
 
         add(playButton);
         add(discardButton);
@@ -47,7 +56,16 @@ public class ButtonPanel extends JPanel {
         button.addActionListener(e -> handleDiscardAction());
         return button;
     }
+    private void updateHandPoints() {
+        List<Card> selectedCards = handPanel.getSelectedCards();
+        int basePoints = PointsCalculator.calculateScore(selectedCards);
 
+        if (basePoints > 0) {
+            currentHandPointsLabel.setText(String.format("Damages: %d", basePoints));
+        } else {
+            currentHandPointsLabel.setText("Damages: 0");
+        }
+    }
     private void handlePlayAction() {
         List<Card> selectedCards = handPanel.getSelectedCards();
 
@@ -60,8 +78,16 @@ public class ButtonPanel extends JPanel {
             // Use GameManager to process card play
             gameManager.selectHand(selectedCards);
 
-            // Update status panel to reflect game state
-            statusPanel.updateStatus(
+            // Remove the played cards from the hand panel
+            handPanel.removeCards(selectedCards);
+
+            // Update both status panels to reflect game state
+            playerStatusPanel.updateStatus(
+                    gameManager.getPlayer(),
+                    gameManager.getCurrentEnemy(),
+                    gameManager.getCurrentLevel()
+            );
+            enemyStatusPanel.updateStatus(
                     gameManager.getPlayer(),
                     gameManager.getCurrentEnemy(),
                     gameManager.getCurrentLevel()
@@ -86,9 +112,14 @@ public class ButtonPanel extends JPanel {
             // Use GameManager to process discard
             gameManager.playerDiscard(selectedCards);
 
-            // Update hand and status
+            // Update hand and both status panels
             handPanel.removeCards(selectedCards);
-            statusPanel.updateStatus(
+            playerStatusPanel.updateStatus(
+                    gameManager.getPlayer(),
+                    gameManager.getCurrentEnemy(),
+                    gameManager.getCurrentLevel()
+            );
+            enemyStatusPanel.updateStatus(
                     gameManager.getPlayer(),
                     gameManager.getCurrentEnemy(),
                     gameManager.getCurrentLevel()
