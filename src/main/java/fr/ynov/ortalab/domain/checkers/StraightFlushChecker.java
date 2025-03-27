@@ -15,8 +15,6 @@ import java.util.stream.Collectors;
 public class StraightFlushChecker implements HandChecker {
     @Override
     public boolean checkHand(List<Card> cards, Set<Card> usedCards, Set<Card> coreCards) {
-        List<Card> sortedCards = HandUtils.getSortedCards(cards);
-
         Map<CardSuit, List<Card>> suitGroups = cards.stream()
                 .collect(Collectors.groupingBy(Card::getSuit));
 

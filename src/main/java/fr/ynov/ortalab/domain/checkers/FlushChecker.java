@@ -36,3 +36,4 @@ public class FlushChecker implements HandChecker {
         return HandType.FLUSH;
     }
 }
+

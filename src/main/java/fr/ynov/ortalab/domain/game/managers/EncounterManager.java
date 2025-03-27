@@ -7,13 +7,13 @@ import main.java.fr.ynov.ortalab.domain.game.Enemy;
 import java.util.Random;
 
 public class EncounterManager {
-    private Player player;
-    private Deck gameDeck;
+    private final Player player;
+    private final Deck gameDeck;
     private Enemy currentEnemy;
     private int currentLevel;
     private static final int FINAL_BOSS_LEVEL = 5;
     private static final Random random = new Random();
-    private EnemyPool enemyPool;
+    private final EnemyPool enemyPool;
 
     public EncounterManager(Player player, Deck gameDeck) {
         this.player = player;

@@ -9,7 +9,6 @@ import java.awt.*;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.function.Consumer;
 
 public class HandPanel extends JPanel {
     private static final int MAX_HAND_SIZE = 8;
@@ -94,8 +93,8 @@ public class HandPanel extends JPanel {
         List<Card> newCards = gameManager.getDeck().drawUniqueCards(cardsToRemove.size());
         playerHand.addAll(newCards);
 
-        // Re-sort the hand based on current sort type
         sortHand(currentSortType);
+
     }
 
     public List<Card> getPlayerHand() {

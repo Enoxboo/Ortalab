@@ -67,8 +67,8 @@ public class MainGameFrame extends JFrame {
         currentHandPointsLabel = new JLabel("Damages : 0", SwingConstants.CENTER);
         currentHandPointsLabel.setFont(new Font("Arial", Font.BOLD, 16));
 
-        // Create sort button panel
-        sortButtonPanel = new SortButtonPanel(handPanel);
+        // Create sort button panel WITH gameManager
+        sortButtonPanel = new SortButtonPanel(handPanel, gameManager);
 
         // Create button panel with game actions
         buttonPanel = new ButtonPanel(

@@ -1,11 +1,11 @@
 package main.java.fr.ynov.ortalab.domain.game;
 
 public class Item {
-    private String name;
-    private ItemType type;
-    private int value;
-    private int buyValue;
-    private int sellValue;
+    private final String name;
+    private final ItemType type;
+    private final int value;
+    private final int buyValue;
+    private final int sellValue;
 
     /**
      * Constructor for an Item

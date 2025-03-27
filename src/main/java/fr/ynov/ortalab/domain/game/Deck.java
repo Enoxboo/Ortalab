@@ -119,4 +119,8 @@ public class Deck {
 
         return uniqueCards;
     }
+
+    public Set<Card> getUsedCards() {
+        return new HashSet<>(usedCards);
+    }
 }
