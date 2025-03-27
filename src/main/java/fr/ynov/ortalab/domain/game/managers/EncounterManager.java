@@ -1,5 +1,7 @@
 package main.java.fr.ynov.ortalab.domain.game.managers;
 
+import main.java.fr.ynov.ortalab.config.GameConfig;
+import main.java.fr.ynov.ortalab.domain.exceptions.DeckException;
 import main.java.fr.ynov.ortalab.domain.game.Player;
 import main.java.fr.ynov.ortalab.domain.game.Deck;
 import main.java.fr.ynov.ortalab.domain.game.Enemy;
@@ -11,7 +13,7 @@ public class EncounterManager {
     private final Deck gameDeck;
     private Enemy currentEnemy;
     private int currentLevel;
-    private static final int FINAL_BOSS_LEVEL = 5;
+    private static final int FINAL_BOSS_LEVEL = GameConfig.FINAL_BOSS_LEVEL;
     private static final Random random = new Random();
     private final EnemyPool enemyPool;
 
@@ -22,18 +24,15 @@ public class EncounterManager {
         this.enemyPool = new EnemyPool();
     }
 
-    public void startFirstEncounter() {
+    public void startFirstEncounter() throws DeckException {
         startEncounter();
     }
 
-    public void startEncounter() {
-        // Reset deck and shuffle
+    public void startEncounter() throws DeckException {
         gameDeck.reset();
 
-        // Create enemy based on current level
         currentEnemy = createEnemy(currentLevel);
 
-        // Draw initial cards for player
         player.drawCards(gameDeck);
     }
 
@@ -43,10 +42,8 @@ public class EncounterManager {
 
     public void completeEncounter(boolean enemyDefeated) {
         if (enemyDefeated) {
-            // Reward player with gold
             player.addGold(calculateGoldReward());
 
-            // Increment level
             currentLevel++;
         }
     }
@@ -56,10 +53,9 @@ public class EncounterManager {
     }
 
     private int calculateGoldReward() {
-        return 10 + (currentLevel * 5);
+        return GameConfig.BASE_GOLD_REWARD + (currentLevel * GameConfig.GOLD_REWARD_MULTIPLIER);
     }
 
-    // Getters
     public Enemy getCurrentEnemy() {
         return currentEnemy;
     }

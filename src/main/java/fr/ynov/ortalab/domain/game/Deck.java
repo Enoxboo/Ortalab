@@ -3,22 +3,25 @@ package main.java.fr.ynov.ortalab.domain.game;
 import main.java.fr.ynov.ortalab.domain.Card;
 import main.java.fr.ynov.ortalab.domain.CardSuit;
 import main.java.fr.ynov.ortalab.domain.CardValue;
+import main.java.fr.ynov.ortalab.domain.exceptions.DeckException;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 public class Deck {
     private List<Card> originalCards;
     private List<Card> availableCards;
     private Set<Card> usedCards;
 
-    /**
-     * Create a standard 52-card deck
-     */
     public Deck() {
+        try {
+            initializeDeck();
+        } catch (Exception e) {
+            // Log the error
+            throw new RuntimeException("Failed to initialize deck", e);
+        }
+    }
+
+    private void initializeDeck() {
         originalCards = new ArrayList<>();
         for (CardSuit suit : CardSuit.values()) {
             for (CardValue value : CardValue.values()) {
@@ -31,7 +34,7 @@ public class Deck {
     /**
      * Shuffle the available cards
      */
-    public void shuffle() {
+    private void shuffle() {
         Collections.shuffle(availableCards);
     }
 
@@ -41,9 +44,9 @@ public class Deck {
      * @return The drawn card
      * @throws IllegalStateException if no cards are available
      */
-    public Card drawCard() {
+    public Card drawCard() throws DeckException {
         if (availableCards.isEmpty()) {
-            throw new IllegalStateException("No cards left in the deck");
+            throw new DeckException("No cards left in the deck. Cannot draw.");
         }
         Card drawnCard = availableCards.remove(availableCards.size() - 1);
         usedCards.add(drawnCard);
@@ -88,36 +91,43 @@ public class Deck {
         shuffle();
     }
 
+    public void replenishIfEmpty() {
+        if (availableCards.isEmpty()) {
+            reset();
+        }
+    }
+
     /**
      * Get a list of unique cards to replace discarded or played cards
      *
      * @param count Number of unique cards to draw
      * @return List of unique cards
      */
-    public List<Card> drawUniqueCards(int count) {
-        List<Card> uniqueCards = new ArrayList<>();
-        Set<Card> drawnCards = new HashSet<>();
+    public List<Card> drawUniqueCards(int count) throws DeckException {
+        if (count > originalCards.size()) {
+            throw new DeckException("Requested more unique cards than available in the deck");
+        }
 
-        // Reset the deck if it's empty
         if (availableCards.isEmpty()) {
             reset();
         }
 
+        Set<Card> uniqueCards = new LinkedHashSet<>();
+
         while (uniqueCards.size() < count && !availableCards.isEmpty()) {
-            Card card = drawCard();
-            if (!drawnCards.contains(card)) {
-                uniqueCards.add(card);
-                drawnCards.add(card);
+            Card drawnCard = drawCard();
+            uniqueCards.add(drawnCard);
+        }
+
+        if (uniqueCards.size() < count) {
+            reset();
+            while (uniqueCards.size() < count && !availableCards.isEmpty()) {
+                Card drawnCard = drawCard();
+                uniqueCards.add(drawnCard);
             }
         }
 
-        // If still not enough unique cards, add non-unique cards
-        while (uniqueCards.size() < count) {
-            Card card = drawCard();
-            uniqueCards.add(card);
-        }
-
-        return uniqueCards;
+        return new ArrayList<>(uniqueCards);
     }
 
     public Set<Card> getUsedCards() {

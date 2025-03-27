@@ -1,5 +1,6 @@
 package main.java.fr.ynov.ortalab.gui.frames;
 
+import main.java.fr.ynov.ortalab.domain.exceptions.DeckException;
 import main.java.fr.ynov.ortalab.domain.game.managers.GameManager;
 import main.java.fr.ynov.ortalab.domain.game.Enemy;
 import main.java.fr.ynov.ortalab.domain.game.Player;
@@ -18,7 +19,7 @@ public class MainGameFrame extends JFrame {
     private SortButtonPanel sortButtonPanel;
     private JLabel currentHandPointsLabel;
 
-    public MainGameFrame(GameManager gameManager) {
+    public MainGameFrame(GameManager gameManager) throws DeckException {
         this.gameManager = gameManager;
 
         // Set fixed size and prevent resizing
@@ -52,7 +53,7 @@ public class MainGameFrame extends JFrame {
         add(bottomPanel, BorderLayout.SOUTH);
     }
 
-    private void initializeGameComponents() {
+    private void initializeGameComponents() throws DeckException {
         Player player = gameManager.getPlayer();
         Enemy enemy = gameManager.getCurrentEnemy();
 
@@ -124,7 +125,12 @@ public class MainGameFrame extends JFrame {
 
     public static void launch(GameManager gameManager) {
         SwingUtilities.invokeLater(() -> {
-            MainGameFrame frame = new MainGameFrame(gameManager);
+            MainGameFrame frame = null;
+            try {
+                frame = new MainGameFrame(gameManager);
+            } catch (DeckException e) {
+                throw new RuntimeException(e);
+            }
             frame.setVisible(true);
         });
     }

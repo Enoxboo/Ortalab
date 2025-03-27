@@ -1,6 +1,10 @@
 package main.java.fr.ynov.ortalab.domain.game.managers;
 
+import main.java.fr.ynov.ortalab.config.GameConfig;
 import main.java.fr.ynov.ortalab.domain.Card;
+import main.java.fr.ynov.ortalab.domain.exceptions.CardOperationException;
+import main.java.fr.ynov.ortalab.domain.exceptions.DeckException;
+import main.java.fr.ynov.ortalab.domain.exceptions.PlayerActionException;
 import main.java.fr.ynov.ortalab.domain.game.Player;
 import main.java.fr.ynov.ortalab.domain.game.Enemy;
 import main.java.fr.ynov.ortalab.domain.game.Deck;
@@ -13,9 +17,9 @@ public class GameManager {
     private EncounterManager encounterManager;
     private TurnManager turnManager;
     private GameState gameState;
-    private static final int MAX_HAND_SIZE = 8;
-    private static final int ACTIVE_HAND_SIZE = 5;
-    private static final int INITIAL_PLAYER_HP = 100;
+    private static final int MAX_HAND_SIZE = GameConfig.MAX_HAND_SIZE;
+    private static final int ACTIVE_HAND_SIZE = GameConfig.ACTIVE_HAND_SIZE;
+    private static final int INITIAL_PLAYER_HP = GameConfig.INITIAL_PLAYER_HP;
 
     public enum GameState {
         INITIALIZING,
@@ -32,50 +36,41 @@ public class GameManager {
     }
 
     private void initializeGame() {
-        // Create player with initial health
         player = new Player(INITIAL_PLAYER_HP);
 
-        // Create new deck
         gameDeck = new Deck();
 
-        // Initialize managers
         encounterManager = new EncounterManager(player, gameDeck);
         turnManager = new TurnManager(player, encounterManager, gameDeck);
 
-        // Set initial game state
         gameState = GameState.INITIALIZING;
     }
 
-    public void startGame() {
+    public void startGame() throws DeckException {
         encounterManager.startFirstEncounter();
         gameState = GameState.SELECTING_HAND;
     }
 
-    public void selectHand(List<Card> selectedCards) {
-        // Discard played cards from the current hand
+    public void selectHand(List<Card> selectedCards) throws DeckException {
         player.getCurrentHand().removeAll(selectedCards);
 
-        // Process the turn with selected cards
         turnManager.processPlayerTurn(selectedCards);
 
-        // Refill hand with new unique cards if needed
         refillHand();
 
         updateGameState();
     }
 
-    private void refillHand() {
-        // Calculate how many cards need to be drawn to reach MAX_HAND_SIZE
+    private void refillHand() throws DeckException {
         int cardsToDraw = MAX_HAND_SIZE - player.getCurrentHand().size();
 
         if (cardsToDraw > 0) {
-            // Draw unique cards to fill the hand
             List<Card> newCards = gameDeck.drawUniqueCards(cardsToDraw);
             player.getCurrentHand().addAll(newCards);
         }
     }
 
-    public void playerDiscard(List<Card> cardsToDiscard) {
+    public void playerDiscard(List<Card> cardsToDiscard) throws CardOperationException, PlayerActionException {
         if (gameState != GameState.SELECTING_HAND) {
             throw new IllegalStateException("Cannot discard cards at this time");
         }
@@ -87,7 +82,6 @@ public class GameManager {
         gameState = turnManager.getCurrentGameState();
     }
 
-    // Getters
     public GameState getGameState() {
         return gameState;
     }

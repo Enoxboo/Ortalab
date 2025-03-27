@@ -1,6 +1,7 @@
 package main.java.fr.ynov.ortalab.gui.panels;
 
 import main.java.fr.ynov.ortalab.domain.Card;
+import main.java.fr.ynov.ortalab.domain.exceptions.DeckException;
 import main.java.fr.ynov.ortalab.domain.game.managers.GameManager;
 import main.java.fr.ynov.ortalab.gui.buttons.CardButton;
 
@@ -23,7 +24,7 @@ public class HandPanel extends JPanel {
         SUIT
     }
 
-    public HandPanel(List<Card> initialHand, GameManager gameManager) {
+    public HandPanel(List<Card> initialHand, GameManager gameManager) throws DeckException {
         this.gameManager = gameManager;
         this.playerHand = new ArrayList<>(validateInitialHand(initialHand));
         this.cardButtons = new ArrayList<>(MAX_HAND_SIZE);
@@ -32,7 +33,7 @@ public class HandPanel extends JPanel {
         sortHand(currentSortType);
     }
 
-    private List<Card> validateInitialHand(List<Card> hand) {
+    private List<Card> validateInitialHand(List<Card> hand) throws DeckException {
         if (hand == null || hand.isEmpty()) {
             return generateNewHand();
         }
@@ -45,7 +46,7 @@ public class HandPanel extends JPanel {
         return hand.subList(0, MAX_HAND_SIZE);
     }
 
-    private List<Card> generateNewHand() {
+    private List<Card> generateNewHand() throws DeckException {
         List<Card> newHand = new ArrayList<>();
         for (int i = 0; i < MAX_HAND_SIZE; i++) {
             newHand.add(gameManager.getDeck().drawCard());
@@ -85,16 +86,18 @@ public class HandPanel extends JPanel {
                 .toList();
     }
 
-    public void removeCards(List<Card> cardsToRemove) {
-        // Remove selected cards from hand
+    public void removeCards(List<Card> cardsToRemove) throws DeckException {
         playerHand.removeAll(cardsToRemove);
 
-        // Draw unique replacement cards from the deck
-        List<Card> newCards = gameManager.getDeck().drawUniqueCards(cardsToRemove.size());
-        playerHand.addAll(newCards);
+        // Ensure we always draw to MAX_HAND_SIZE
+        while (playerHand.size() < MAX_HAND_SIZE) {
+            List<Card> newCards = gameManager.getDeck().drawUniqueCards(
+                    MAX_HAND_SIZE - playerHand.size()
+            );
+            playerHand.addAll(newCards);
+        }
 
         sortHand(currentSortType);
-
     }
 
     public List<Card> getPlayerHand() {
