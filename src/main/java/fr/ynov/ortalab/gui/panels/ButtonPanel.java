@@ -1,6 +1,7 @@
 package main.java.fr.ynov.ortalab.gui.panels;
 
 import main.java.fr.ynov.ortalab.domain.Card;
+import main.java.fr.ynov.ortalab.domain.HandEvaluator;
 import main.java.fr.ynov.ortalab.domain.PointsCalculator;
 import main.java.fr.ynov.ortalab.domain.game.managers.GameManager;
 
@@ -56,16 +57,24 @@ public class ButtonPanel extends JPanel {
         button.addActionListener(e -> handleDiscardAction());
         return button;
     }
+
     private void updateHandPoints() {
         List<Card> selectedCards = handPanel.getSelectedCards();
-        int basePoints = PointsCalculator.calculateScore(selectedCards);
 
-        if (basePoints > 0) {
-            currentHandPointsLabel.setText(String.format("Damages: %d", basePoints));
-        } else {
-            currentHandPointsLabel.setText("Damages: 0");
+        if (selectedCards.isEmpty()) {
+            currentHandPointsLabel.setText("Hand: None");
+            return;
         }
+
+        // Create a HandEvaluator to get the hand type and base points
+        HandEvaluator evaluator = new HandEvaluator(selectedCards);
+        String handType = evaluator.getHandType();
+        int basePoints = evaluator.getPoints();
+
+        // Display only the hand type and base points, not the total damage
+        currentHandPointsLabel.setText(String.format("%s: %d", handType, basePoints));
     }
+
     private void handlePlayAction() {
         List<Card> selectedCards = handPanel.getSelectedCards();
 

@@ -127,6 +127,8 @@ public class HandPanel extends JPanel {
         initializeHand();
     }
 
+
+
     public void addCardSelectionListener(Runnable listener) {
         selectionListeners.add(listener);
     }

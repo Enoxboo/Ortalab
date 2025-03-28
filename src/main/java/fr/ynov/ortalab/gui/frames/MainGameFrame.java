@@ -79,6 +79,16 @@ public class MainGameFrame extends JFrame {
                 enemyStatusPanel,
                 currentHandPointsLabel
         );
+        JButton tutorialButton = createTutorialButton();
+        sortButtonPanel.add(Box.createVerticalStrut(10));
+        sortButtonPanel.add(tutorialButton);
+    }
+
+    private JButton createTutorialButton() {
+        JButton tutorialButton = new JButton("Tutoriel");
+        tutorialButton.setAlignmentX(Component.CENTER_ALIGNMENT);
+        tutorialButton.addActionListener(e -> TutorialFrame.showTutorial());
+        return tutorialButton;
     }
 
     private JPanel createStatusPanel() {
