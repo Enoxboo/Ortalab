@@ -177,6 +177,15 @@ public class MainGameFrame extends JFrame {
         });
     }
 
+    public void refreshGameDisplay() {
+        Player player = gameManager.getPlayer();
+        Enemy enemy = gameManager.getCurrentEnemy();
+        int currentLevel = gameManager.getCurrentLevel();
+
+        playerStatusPanel.updateStatus(player, enemy, currentLevel);
+        enemyStatusPanel.updateStatus(player, enemy, currentLevel);
+        handPanel.sortHand(handPanel.getCurrentSortType());
+    }
     // Clean up resources when closing
     @Override
     public void dispose() {

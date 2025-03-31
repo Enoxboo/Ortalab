@@ -241,9 +241,7 @@ public class Player {
     }
 
     public void addGold(int amount) {
-        if (amount > 0) {
-            this.gold += amount;
-        }
+        this.gold += amount;
     }
 
     // Getters and Setters

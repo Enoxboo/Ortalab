@@ -29,11 +29,11 @@ public class ItemShopFrame extends JFrame {
     private ItemShopFrame(GameManager gameManager, JFrame parentFrame) {
         this.gameManager = gameManager;
         this.player = gameManager.getPlayer();
-        this.itemShop = new ItemShop(); // Create instance of ItemShop
+        this.itemShop = new ItemShop();
         this.parentFrame = parentFrame;
 
         setTitle("Item Shop");
-        setSize(900, 600);
+        setSize(1200, 660);
         setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         setLocationRelativeTo(null);
         setResizable(false);
@@ -252,6 +252,10 @@ public class ItemShopFrame extends JFrame {
             setVisible(false);
             dispose();
             parentFrame.setVisible(true);
+
+            if (parentFrame instanceof MainGameFrame) {
+                ((MainGameFrame) parentFrame).refreshGameDisplay();
+            }
         } catch (Exception e) {
             JOptionPane.showMessageDialog(this,
                     "Error returning to game: " + e.getMessage(),

@@ -56,6 +56,7 @@ public class GameManager {
         encounterManager.startEncounter();
         player.resetDiscards();
         gameState = GameState.SELECTING_HAND;
+        Enemy currentEnemy = encounterManager.getCurrentEnemy();
     }
 
     public void selectHand(List<Card> selectedCards) throws DeckException {
