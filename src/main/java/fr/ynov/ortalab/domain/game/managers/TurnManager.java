@@ -33,6 +33,10 @@ public class TurnManager {
         discardUsedCards(selectedCards);
 
         if (remainingEnemyHP <= 0) {
+            // Enemy is defeated
+            boolean shouldVisitShop = encounterManager.shouldVisitShop();
+
+            // Complete the encounter, which updates the level
             encounterManager.completeEncounter(true);
 
             if (encounterManager.isGameComplete()) {
@@ -40,6 +44,13 @@ public class TurnManager {
                 return;
             }
 
+            // If we should visit the shop after this encounter
+            if (shouldVisitShop) {
+                currentGameState = GameState.SHOP_VISIT;
+                return;
+            }
+
+            // Otherwise start the next encounter
             encounterManager.startEncounter();
             player.resetDiscards();
             currentGameState = GameState.SELECTING_HAND;
@@ -47,6 +58,7 @@ public class TurnManager {
         }
         processEnemyTurn(currentEnemy);
     }
+
     private void discardUsedCards(List<Card> usedCards) {
         for (Card card : usedCards) {
             gameDeck.returnCard(card);
@@ -70,6 +82,7 @@ public class TurnManager {
             currentGameState = GameState.SELECTING_HAND;
         }
     }
+
     public GameState getCurrentGameState() {
         return currentGameState;
     }

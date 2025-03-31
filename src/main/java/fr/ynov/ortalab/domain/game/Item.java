@@ -27,12 +27,8 @@ public class Item {
      * Enumeration of possible item types
      */
     public enum ItemType {
-        CRITICAL_CHANCE,      // Increases critical hit chance
-        HEART_CARD_DAMAGE,    // Increases damage for Heart cards
-        EXTRA_DISCARD,        // Increases number of discards
-        HEALTH_BONUS,         // Increases max health
-        DAMAGE_REDUCTION,     // Reduces incoming damage
-        GOLD_BONUS            // Increases gold from victories
+        SUIT_DAMAGE,
+        HAND_TYPE_DAMAGE
     }
 
     // Getters

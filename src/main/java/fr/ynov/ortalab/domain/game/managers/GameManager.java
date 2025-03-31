@@ -27,6 +27,7 @@ public class GameManager {
         SELECTING_HAND,
         PLAYER_TURN,
         ENEMY_TURN,
+        SHOP_VISIT,
         GAME_OVER,
         VICTORY
     }
@@ -48,6 +49,12 @@ public class GameManager {
 
     public void startGame() throws DeckException {
         encounterManager.startFirstEncounter();
+        gameState = GameState.SELECTING_HAND;
+    }
+
+    public void continueFromShop() throws DeckException {
+        encounterManager.startEncounter();
+        player.resetDiscards();
         gameState = GameState.SELECTING_HAND;
     }
 

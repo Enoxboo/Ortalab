@@ -17,6 +17,9 @@ public class EncounterManager {
     private static final Random random = new Random();
     private final EnemyPool enemyPool;
 
+    // Add shop levels as constants
+    private static final int[] SHOP_LEVELS = {1, 3};
+
     public EncounterManager(Player player, Deck gameDeck) {
         this.player = player;
         this.gameDeck = gameDeck;
@@ -46,6 +49,17 @@ public class EncounterManager {
 
             currentLevel++;
         }
+    }
+
+    // New method to check if a shop visit should happen
+    public boolean shouldVisitShop() {
+        // Check if current level (before incrementing) is in the shop levels array
+        for (int shopLevel : SHOP_LEVELS) {
+            if (currentLevel == shopLevel) {
+                return true;
+            }
+        }
+        return false;
     }
 
     public boolean isGameComplete() {

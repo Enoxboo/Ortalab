@@ -2,13 +2,17 @@ package main.java.fr.ynov.ortalab.domain.game;
 
 import main.java.fr.ynov.ortalab.config.GameConfig;
 import main.java.fr.ynov.ortalab.domain.Card;
+import main.java.fr.ynov.ortalab.domain.CardSuit;
+import main.java.fr.ynov.ortalab.domain.HandType;
 import main.java.fr.ynov.ortalab.domain.PointsCalculator;
 import main.java.fr.ynov.ortalab.domain.exceptions.DeckException;
 import main.java.fr.ynov.ortalab.domain.exceptions.PlayerActionException;
 import main.java.fr.ynov.ortalab.domain.exceptions.CardOperationException;
 
 import java.util.ArrayList;
+import java.util.EnumMap;
 import java.util.List;
+import java.util.Map;
 
 public class Player {
     private int healthPoints;
@@ -25,6 +29,8 @@ public class Player {
     private int criticalChance;
     private List<Card> currentHand;
     private List<Card> selectedHand;
+    private Map<CardSuit, Integer> suitDamageBonus;
+    private Map<HandType, Integer> handTypeDamageBonus;
 
     public Player(int initialHP) {
         this.healthPoints = initialHP;
@@ -36,6 +42,8 @@ public class Player {
         this.inventory = new ArrayList<>();
         this.currentHand = new ArrayList<>();
         this.selectedHand = new ArrayList<>();
+        this.suitDamageBonus = new EnumMap<>(CardSuit.class);
+        this.handTypeDamageBonus = new EnumMap<>(HandType.class);
     }
 
     /**
@@ -64,7 +72,7 @@ public class Player {
      * @return Calculated damage
      */
     public int calculateHandDamage() {
-        return PointsCalculator.calculateScore(selectedHand);
+        return PointsCalculator.calculateScore(selectedHand, this);
     }
 
     /**
@@ -184,11 +192,21 @@ public class Player {
      * @param item Item to apply
      */
     private void applyItemEffect(Item item) {
-        // Implement specific item effects here
-        // For example:
-        // if (item.getType() == ItemType.CRITICAL_CHANCE) {
-        //     criticalChance += item.getValue();
-        // }
+        switch (item.getType()) {
+            case SUIT_DAMAGE:
+                // The item name contains the suit information
+                if (item.getName().equals("The Moon")) {
+                    suitDamageBonus.put(CardSuit.CLUBS, suitDamageBonus.getOrDefault(CardSuit.CLUBS, 0) + item.getValue());
+                } else if (item.getName().equals("The Sun")) {
+                    suitDamageBonus.put(CardSuit.DIAMONDS, suitDamageBonus.getOrDefault(CardSuit.DIAMONDS, 0) + item.getValue());
+                }
+                break;
+            case HAND_TYPE_DAMAGE:
+                if (item.getName().equals("Flow")) {
+                    handTypeDamageBonus.put(HandType.FLUSH, handTypeDamageBonus.getOrDefault(HandType.FLUSH, 0) + item.getValue());
+                }
+                break;
+        }
     }
 
     /**
@@ -197,7 +215,29 @@ public class Player {
      * @param item Item to remove effects for
      */
     private void removeItemEffect(Item item) {
-        // Implement removing item effects here
+        switch (item.getType()) {
+            case SUIT_DAMAGE:
+                if (item.getName().equals("The Moon")) {
+                    suitDamageBonus.put(CardSuit.CLUBS, suitDamageBonus.getOrDefault(CardSuit.CLUBS, 0) - item.getValue());
+                    if (suitDamageBonus.get(CardSuit.CLUBS) <= 0) {
+                        suitDamageBonus.remove(CardSuit.CLUBS);
+                    }
+                } else if (item.getName().equals("The Sun")) {
+                    suitDamageBonus.put(CardSuit.DIAMONDS, suitDamageBonus.getOrDefault(CardSuit.DIAMONDS, 0) - item.getValue());
+                    if (suitDamageBonus.get(CardSuit.DIAMONDS) <= 0) {
+                        suitDamageBonus.remove(CardSuit.DIAMONDS);
+                    }
+                }
+                break;
+            case HAND_TYPE_DAMAGE:
+                if (item.getName().equals("Flow")) {
+                    handTypeDamageBonus.put(HandType.FLUSH, handTypeDamageBonus.getOrDefault(HandType.FLUSH, 0) - item.getValue());
+                    if (handTypeDamageBonus.get(HandType.FLUSH) <= 0) {
+                        handTypeDamageBonus.remove(HandType.FLUSH);
+                    }
+                }
+                break;
+        }
     }
 
     public void addGold(int amount) {
@@ -245,5 +285,17 @@ public class Player {
 
     public void setDiscardCount(int count) {
         this.discardCount = count;
+    }
+
+    public Map<CardSuit, Integer> getSuitDamageBonus() {
+        return new EnumMap<>(suitDamageBonus);
+    }
+
+    public Map<HandType, Integer> getHandTypeDamageBonus() {
+        return new EnumMap<>(handTypeDamageBonus);
+    }
+
+    public List<Item> getInventory() {
+        return new ArrayList<>(inventory);
     }
 }

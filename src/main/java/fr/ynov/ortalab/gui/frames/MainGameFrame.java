@@ -6,6 +6,7 @@ import main.java.fr.ynov.ortalab.domain.game.Enemy;
 import main.java.fr.ynov.ortalab.domain.game.Player;
 import main.java.fr.ynov.ortalab.gui.panels.*;
 import main.java.fr.ynov.ortalab.domain.PointsCalculator;
+import main.java.fr.ynov.ortalab.domain.game.managers.GameManager.GameState;
 
 import javax.swing.*;
 import java.awt.*;
@@ -18,6 +19,9 @@ public class MainGameFrame extends JFrame {
     private StatusPanel enemyStatusPanel;
     private SortButtonPanel sortButtonPanel;
     private JLabel currentHandPointsLabel;
+
+    // Timer to check game state periodically
+    private Timer gameStateTimer;
 
     public MainGameFrame(GameManager gameManager) throws DeckException {
         this.gameManager = gameManager;
@@ -44,13 +48,41 @@ public class MainGameFrame extends JFrame {
         // Initialize game components
         initializeGameComponents();
 
-        // Create status panel container
-        JPanel statusPanel = createStatusPanel();
-        add(statusPanel, BorderLayout.CENTER);
+        // Create main content panel
+        JPanel mainContentPanel = new JPanel(new BorderLayout());
+
+        // Create center panel with status panels
+        JPanel centerPanel = createStatusPanel();
+        mainContentPanel.add(centerPanel, BorderLayout.CENTER);
+
+        // Add main content panel to the frame
+        add(mainContentPanel, BorderLayout.CENTER);
 
         // Create bottom panel for game elements
         JPanel bottomPanel = createBottomPanel();
         add(bottomPanel, BorderLayout.SOUTH);
+
+        // Create timer to check game state periodically
+        createGameStateTimer();
+    }
+
+    private void createGameStateTimer() {
+        gameStateTimer = new Timer(100, e -> {
+            if (gameManager.getGameState() == GameState.SHOP_VISIT) {
+                // If we need to visit the shop, stop the timer, show the shop, and hide this frame
+                gameStateTimer.stop();
+                showShop();
+            }
+        });
+        gameStateTimer.start();
+    }
+
+    private void showShop() {
+        // Hide the game frame while showing the shop
+        setVisible(false);
+
+        // Show the item shop
+        ItemShopFrame.displayShopMidGame(gameManager, this);
     }
 
     private void initializeGameComponents() throws DeckException {
@@ -143,5 +175,14 @@ public class MainGameFrame extends JFrame {
             }
             frame.setVisible(true);
         });
+    }
+
+    // Clean up resources when closing
+    @Override
+    public void dispose() {
+        if (gameStateTimer != null) {
+            gameStateTimer.stop();
+        }
+        super.dispose();
     }
 }
