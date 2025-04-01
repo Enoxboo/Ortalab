@@ -38,7 +38,6 @@ public class Player {
         this.gold = 0;
         this.discardCount = 0;
         this.totalDiscardCount = 0;
-        this.criticalChance = GameConfig.INITIAL_CRITICAL_CHANCE;
         this.inventory = new ArrayList<>();
         this.currentHand = new ArrayList<>();
         this.selectedHand = new ArrayList<>();

@@ -6,61 +6,75 @@ import main.java.fr.ynov.ortalab.domain.CardValue;
 import main.java.fr.ynov.ortalab.domain.HandType;
 import main.java.fr.ynov.ortalab.domain.utils.HandUtils;
 
-import java.util.Comparator;
+import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
-import java.util.stream.Collectors;
+import java.util.Map;
+import java.util.Comparator;
 
 public class StraightFlushChecker implements HandChecker {
+
     @Override
     public boolean checkHand(List<Card> cards, Set<Card> usedCards, Set<Card> coreCards) {
-        Map<CardSuit, List<Card>> suitGroups = cards.stream()
-                .collect(Collectors.groupingBy(Card::getSuit));
+        Map<CardSuit, List<Card>> suitGroups = HandUtils.groupBySuit(cards);
 
-        for (List<Card> suitGroup : suitGroups.values()) {
-            if (suitGroup.size() >= 5) {
-                List<Card> suitSorted = suitGroup.stream()
-                        .sorted(Comparator.comparingInt(card -> card.getValue().getNumericValue()))
-                        .toList();
+        for (Map.Entry<CardSuit, List<Card>> entry : suitGroups.entrySet()) {
+            List<Card> sameSuitCards = entry.getValue();
 
-                for (int i = 0; i <= suitSorted.size() - 5; i++) {
-                    boolean isStraight = true;
-                    for (int j = i; j < i + 4; j++) {
-                        if (suitSorted.get(j).getValue().getNumericValue() + 1 !=
-                                suitSorted.get(j + 1).getValue().getNumericValue()) {
-                            isStraight = false;
-                            break;
-                        }
-                    }
+            if (sameSuitCards.size() < 5) {
+                continue;
+            }
 
-                    if (isStraight) {
-                        List<Card> straightFlushCards = suitSorted.subList(i, i + 5);
-                        usedCards.addAll(straightFlushCards);
-                        coreCards.addAll(straightFlushCards);
-                        return true;
-                    }
-                }
+            List<CardValue> distinctValues = sameSuitCards.stream()
+                    .map(Card::getValue)
+                    .distinct()
+                    .sorted(Comparator.comparingInt(CardValue::getNumericValue))
+                    .toList();
 
-                boolean hasAce = suitGroup.stream().anyMatch(card -> card.getValue() == CardValue.ACE);
-                boolean hasTwo = suitGroup.stream().anyMatch(card -> card.getValue() == CardValue.TWO);
-                boolean hasThree = suitGroup.stream().anyMatch(card -> card.getValue() == CardValue.THREE);
-                boolean hasFour = suitGroup.stream().anyMatch(card -> card.getValue() == CardValue.FOUR);
-                boolean hasFive = suitGroup.stream().anyMatch(card -> card.getValue() == CardValue.FIVE);
+            // Check for wheel straight flush (A-5)
+            if (distinctValues.contains(CardValue.TWO) &&
+                    distinctValues.contains(CardValue.THREE) &&
+                    distinctValues.contains(CardValue.FOUR) &&
+                    distinctValues.contains(CardValue.FIVE) &&
+                    distinctValues.contains(CardValue.ACE)) {
 
-                if (hasAce && hasTwo && hasThree && hasFour && hasFive) {
-                    List<Card> lowStraightFlushCards = new java.util.ArrayList<>();
-                    for (Card card : suitGroup) {
-                        if (card.getValue() == CardValue.ACE ||
+                List<Card> straightFlushCards = sameSuitCards.stream()
+                        .filter(card -> card.getValue() == CardValue.ACE ||
                                 card.getValue() == CardValue.TWO ||
                                 card.getValue() == CardValue.THREE ||
                                 card.getValue() == CardValue.FOUR ||
-                                card.getValue() == CardValue.FIVE) {
-                            lowStraightFlushCards.add(card);
-                            usedCards.add(card);
-                        }
+                                card.getValue() == CardValue.FIVE)
+                        .limit(5)
+                        .toList();
+
+                usedCards.addAll(straightFlushCards);
+                coreCards.addAll(straightFlushCards);
+                return true;
+            }
+
+            // Check for regular straight flush
+            for (int i = 0; i <= distinctValues.size() - 5; i++) {
+                boolean isStraight = true;
+                for (int j = i; j < i + 4; j++) {
+                    if (distinctValues.get(j).getNumericValue() + 1 != distinctValues.get(j + 1).getNumericValue()) {
+                        isStraight = false;
+                        break;
                     }
-                    coreCards.addAll(lowStraightFlushCards);
+                }
+
+                if (isStraight) {
+                    Set<CardValue> straightValues = new HashSet<>();
+                    for (int j = i; j < i + 5; j++) {
+                        straightValues.add(distinctValues.get(j));
+                    }
+
+                    List<Card> straightFlushCards = sameSuitCards.stream()
+                            .filter(card -> straightValues.contains(card.getValue()))
+                            .limit(5)
+                            .toList();
+
+                    usedCards.addAll(straightFlushCards);
+                    coreCards.addAll(straightFlushCards);
                     return true;
                 }
             }

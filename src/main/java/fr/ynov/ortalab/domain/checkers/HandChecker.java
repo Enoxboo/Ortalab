@@ -6,6 +6,9 @@ import main.java.fr.ynov.ortalab.domain.HandType;
 import java.util.List;
 import java.util.Set;
 
+/**
+ * Interface for poker hand checkers.
+ */
 public interface HandChecker {
     /**
      * Checks if the given cards form a specific hand type.

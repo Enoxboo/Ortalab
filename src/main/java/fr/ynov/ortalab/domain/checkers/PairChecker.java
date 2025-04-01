@@ -3,45 +3,40 @@ package main.java.fr.ynov.ortalab.domain.checkers;
 import main.java.fr.ynov.ortalab.domain.Card;
 import main.java.fr.ynov.ortalab.domain.CardValue;
 import main.java.fr.ynov.ortalab.domain.HandType;
+import main.java.fr.ynov.ortalab.domain.utils.HandUtils;
 
-import java.util.EnumMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
-import java.util.ArrayList;
-import java.util.Comparator;
+import java.util.HashSet;
 
 public class PairChecker implements HandChecker {
+
     @Override
     public boolean checkHand(List<Card> cards, Set<Card> usedCards, Set<Card> coreCards) {
-        // Use EnumMap for potentially faster lookup
-        Map<CardValue, List<Card>> valueGroups = new EnumMap<>(CardValue.class);
+        List<CardValue> pairValues = HandUtils.findValueGroups(cards, 2);
 
-        // Single pass grouping
-        for (Card card : cards) {
-            valueGroups.computeIfAbsent(card.getValue(), k -> new ArrayList<>()).add(card);
+        if (pairValues.isEmpty()) {
+            return false;
         }
 
-        for (Map.Entry<CardValue, List<Card>> entry : valueGroups.entrySet()) {
-            if (entry.getValue().size() == 2) {
-                // Add the pair cards to both used and core cards
-                List<Card> pairCards = entry.getValue();
-                usedCards.addAll(pairCards);
-                coreCards.addAll(pairCards);
+        // Get highest pair
+        CardValue pairValue = pairValues.getFirst();
+        List<Card> pairCards = cards.stream()
+                .filter(card -> card.getValue() == pairValue)
+                .limit(2)
+                .toList();
 
-                // More efficient kicker selection
-                List<Card> kickers = cards.stream()
-                        .filter(card -> card.getValue() != entry.getKey())
-                        .sorted(Comparator.comparingInt((Card c) -> c.getValue().getNumericValue()).reversed())
-                        .limit(3)
-                        .toList();
+        usedCards.addAll(pairCards);
+        coreCards.addAll(pairCards);
 
-                usedCards.addAll(kickers);
-                return true;
-            }
-        }
+        // Find three highest kickers
+        Set<CardValue> excludeValues = new HashSet<>();
+        excludeValues.add(pairValue);
+        List<Card> kickers = HandUtils.getTopCardsByValue(cards, excludeValues, 3);
 
-        return false;
+        usedCards.addAll(kickers);
+
+        return true;
     }
 
     @Override

@@ -2,44 +2,44 @@ package main.java.fr.ynov.ortalab.domain.checkers;
 
 import main.java.fr.ynov.ortalab.domain.Card;
 import main.java.fr.ynov.ortalab.domain.CardSuit;
+import main.java.fr.ynov.ortalab.domain.CardValue;
 import main.java.fr.ynov.ortalab.domain.HandType;
 import main.java.fr.ynov.ortalab.domain.utils.HandUtils;
 
-import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import java.util.stream.Collectors;
+import java.util.Map;
 
 public class RoyalFlushChecker implements HandChecker {
+
+    private static final Set<CardValue> ROYAL_VALUES = new HashSet<>(Arrays.asList(
+            CardValue.TEN, CardValue.JACK, CardValue.QUEEN, CardValue.KING, CardValue.ACE
+    ));
+
     @Override
     public boolean checkHand(List<Card> cards, Set<Card> usedCards, Set<Card> coreCards) {
-        List<Card> sortedCards = HandUtils.getSortedCards(cards);
+        Map<CardSuit, List<Card>> suitGroups = HandUtils.groupBySuit(cards);
 
-        // Group cards by suit
-        for (CardSuit suit : CardSuit.values()) {
-            List<Card> sameSuitCards = sortedCards.stream()
-                    .filter(card -> card.getSuit() == suit)
-                    .collect(Collectors.toList());
-
-            if (sameSuitCards.size() < 5) {
+        for (Map.Entry<CardSuit, List<Card>> entry : suitGroups.entrySet()) {
+            if (entry.getValue().size() < 5) {
                 continue;
             }
 
-            boolean hasTen = false, hasJack = false, hasQueen = false,
-                    hasKing = false, hasAce = false;
-            List<Card> royalCards = new ArrayList<>();
+            List<Card> sameSuitCards = entry.getValue();
 
-            for (Card card : sameSuitCards) {
-                switch (card.getValue()) {
-                    case TEN -> { hasTen = true; royalCards.add(card); }
-                    case JACK -> { hasJack = true; royalCards.add(card); }
-                    case QUEEN -> { hasQueen = true; royalCards.add(card); }
-                    case KING -> { hasKing = true; royalCards.add(card); }
-                    case ACE -> { hasAce = true; royalCards.add(card); }
-                }
-            }
+            // Check if all royal values exist in this suit
+            boolean hasAllRoyalValues = ROYAL_VALUES.stream()
+                    .allMatch(value -> sameSuitCards.stream()
+                            .anyMatch(card -> card.getValue() == value));
 
-            if (hasTen && hasJack && hasQueen && hasKing && hasAce) {
+            if (hasAllRoyalValues) {
+                List<Card> royalCards = sameSuitCards.stream()
+                        .filter(card -> ROYAL_VALUES.contains(card.getValue()))
+                        .limit(5)
+                        .toList();
+
                 usedCards.addAll(royalCards);
                 coreCards.addAll(royalCards);
                 return true;
