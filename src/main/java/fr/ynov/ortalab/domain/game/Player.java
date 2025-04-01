@@ -19,24 +19,21 @@ public class Player {
     private final int maxHealthPoints;
     private int gold;
     private int discardCount;
-    private int totalDiscardCount;
     private final int MAX_HAND_SIZE = GameConfig.MAX_HAND_SIZE;
     private final int ACTIVE_HAND_SIZE = GameConfig.ACTIVE_HAND_SIZE;
     private final int MAX_DISCARDS_PER_ENEMY = GameConfig.MAX_DISCARDS_PER_ENEMY;
 
-    private List<Item> inventory;
-    private int criticalChance;
-    private List<Card> currentHand;
+    private final List<Item> inventory;
+    private final List<Card> currentHand;
     private List<Card> selectedHand;
-    private Map<CardSuit, Integer> suitDamageBonus;
-    private Map<HandType, Integer> handTypeDamageBonus;
+    private final Map<CardSuit, Integer> suitDamageBonus;
+    private final Map<HandType, Integer> handTypeDamageBonus;
 
     public Player(int initialHP) {
         this.healthPoints = initialHP;
         this.maxHealthPoints = initialHP;
         this.gold = 0;
         this.discardCount = 0;
-        this.totalDiscardCount = 0;
         this.inventory = new ArrayList<>();
         this.currentHand = new ArrayList<>();
         this.selectedHand = new ArrayList<>();
@@ -129,7 +126,6 @@ public class Player {
             }
 
             discardCount++;
-            totalDiscardCount++;
         } catch (Exception e) {
             throw new PlayerActionException("Error during card discard: " + e.getMessage(), e);
         }
@@ -144,7 +140,7 @@ public class Player {
             throw new PlayerActionException("No cards selected for discard");
         }
 
-        if (cardsToDiscard.size() < 1 || cardsToDiscard.size() > ACTIVE_HAND_SIZE) {
+        if (cardsToDiscard.size() > ACTIVE_HAND_SIZE) {
             throw new PlayerActionException("Must discard between 1 and 5 cards");
         }
     }
@@ -157,84 +153,23 @@ public class Player {
      * Add an item to the player's inventory
      *
      * @param item Item to add
-     * @return true if item was added successfully
      */
-    public boolean addItem(Item item) {
+    public void addItem(Item item) {
         if (inventory.size() < GameConfig.MAX_INVENTORY_SIZE) {
             inventory.add(item);
             item.applyTo(this); // Use the item's built-in effect
-            return true;
         }
-        return false;
     }
-
 
     /**
      * Sell an item from inventory
      *
      * @param item Item to sell
-     * @return true if item was sold successfully
      */
-    public boolean sellItem(Item item) {
+    public void sellItem(Item item) {
         if (inventory.remove(item)) {
             gold += item.getSellValue();
-            item.removeFrom(this); // Use the item's built-in removal effect
-            return true;
-        }
-        return false;
-    }
-
-    /**
-     * Apply the effects of an item
-     *
-     * @param item Item to apply
-     */
-    private void applyItemEffect(Item item) {
-        switch (item.getType()) {
-            case SUIT_DAMAGE:
-                // The item name contains the suit information
-                if (item.getName().equals("The Moon")) {
-                    suitDamageBonus.put(CardSuit.CLUBS, suitDamageBonus.getOrDefault(CardSuit.CLUBS, 0) + item.getValue());
-                } else if (item.getName().equals("The Sun")) {
-                    suitDamageBonus.put(CardSuit.DIAMONDS, suitDamageBonus.getOrDefault(CardSuit.DIAMONDS, 0) + item.getValue());
-                }
-                break;
-            case HAND_TYPE_DAMAGE:
-                if (item.getName().equals("Flow")) {
-                    handTypeDamageBonus.put(HandType.FLUSH, handTypeDamageBonus.getOrDefault(HandType.FLUSH, 0) + item.getValue());
-                }
-                break;
-        }
-    }
-
-    /**
-     * Remove the effects of an item
-     *
-     * @param item Item to remove effects for
-     */
-    private void removeItemEffect(Item item) {
-        switch (item.getType()) {
-            case SUIT_DAMAGE:
-                if (item.getName().equals("The Moon")) {
-                    suitDamageBonus.put(CardSuit.CLUBS, suitDamageBonus.getOrDefault(CardSuit.CLUBS, 0) - item.getValue());
-                    if (suitDamageBonus.get(CardSuit.CLUBS) <= 0) {
-                        suitDamageBonus.remove(CardSuit.CLUBS);
-                    }
-                } else if (item.getName().equals("The Sun")) {
-                    suitDamageBonus.put(CardSuit.DIAMONDS, suitDamageBonus.getOrDefault(CardSuit.DIAMONDS, 0) - item.getValue());
-                    if (suitDamageBonus.get(CardSuit.DIAMONDS) <= 0) {
-                        suitDamageBonus.remove(CardSuit.DIAMONDS);
-                    }
-                }
-                break;
-            case HAND_TYPE_DAMAGE:
-                if (item.getName().equals("Flow")) {
-                    handTypeDamageBonus.put(HandType.FLUSH, handTypeDamageBonus.getOrDefault(HandType.FLUSH, 0) - item.getValue());
-                    if (handTypeDamageBonus.get(HandType.FLUSH) <= 0) {
-                        handTypeDamageBonus.remove(HandType.FLUSH);
-                    }
-                }
-                break;
+            item.removeFrom(this);
         }
     }
 
@@ -255,32 +190,12 @@ public class Player {
         return gold;
     }
 
-    public int getCriticalChance() {
-        return criticalChance;
-    }
-
     public List<Card> getCurrentHand() {
         return new ArrayList<>(currentHand);
     }
 
-    public List<Card> getSelectedHand() {
-        return new ArrayList<>(selectedHand);
-    }
-
     public int getRemainingDiscards() {
         return MAX_DISCARDS_PER_ENEMY - discardCount;
-    }
-
-    public int getTotalDiscardCount() {
-        return totalDiscardCount;
-    }
-
-    public int getDiscardCount() {
-        return discardCount;
-    }
-
-    public void setDiscardCount(int count) {
-        this.discardCount = count;
     }
 
     public Map<CardSuit, Integer> getSuitDamageBonus() {

@@ -5,7 +5,13 @@ import main.java.fr.ynov.ortalab.domain.card.CardSuit;
 import main.java.fr.ynov.ortalab.domain.card.CardValue;
 import main.java.fr.ynov.ortalab.domain.exceptions.DeckException;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Set;
+import java.util.HashSet;
+import java.util.LinkedHashSet;
+
 
 public class Deck {
     private List<Card> originalCards;
@@ -48,7 +54,7 @@ public class Deck {
         if (availableCards.isEmpty()) {
             throw new DeckException("No cards left in the deck. Cannot draw.");
         }
-        Card drawnCard = availableCards.remove(availableCards.size() - 1);
+        Card drawnCard = availableCards.removeLast();
         usedCards.add(drawnCard);
         return drawnCard;
     }
@@ -62,15 +68,6 @@ public class Deck {
         if (!usedCards.contains(card) && !availableCards.contains(card)) {
             availableCards.add(card);
         }
-    }
-
-    /**
-     * Get the number of cards remaining in the deck
-     *
-     * @return Remaining card count
-     */
-    public int getRemainingCards() {
-        return availableCards.size();
     }
 
     /**

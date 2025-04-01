@@ -3,19 +3,15 @@ package main.java.fr.ynov.ortalab.gui.panels;
 import main.java.fr.ynov.ortalab.domain.game.Player;
 import main.java.fr.ynov.ortalab.domain.game.Enemy;
 
-import javax.swing.*;
-import java.awt.*;
+import javax.swing.JTextArea;
+import java.awt.Font;
+
 
 public class StatusPanel extends JTextArea {
-    private Player player;
-    private Enemy enemy;
-    private int currentLevel;
-    private boolean isPlayerPanel;
+
+    private final boolean isPlayerPanel;
 
     public StatusPanel(Player player, Enemy enemy, int currentLevel, boolean isPlayerPanel) {
-        this.player = player;
-        this.enemy = enemy;
-        this.currentLevel = currentLevel;
         this.isPlayerPanel = isPlayerPanel;
 
         // Configure text area
@@ -29,21 +25,18 @@ public class StatusPanel extends JTextArea {
     }
 
     public void updateStatus(Player player, Enemy enemy, int currentLevel) {
-        this.player = player;
-        this.enemy = enemy;
-        this.currentLevel = currentLevel;
-
-        // Prepare the base status text
         StringBuilder statusTextBuilder = new StringBuilder();
 
         if (isPlayerPanel) {
             // Player status details
             statusTextBuilder.append(
                     String.format(
-                            "--- Player Status ---\n" +
-                                    "HP: %d/%d\n" +
-                                    "Discards Left: %d\n" +
-                                    "Gold: %d\n",
+                            """
+                                    --- Player Status ---
+                                    HP: %d/%d
+                                    Discards Left: %d
+                                    Gold: %d
+                                    """,
                             player.getHealthPoints(), player.getMaxHealthPoints(),
                             player.getRemainingDiscards(),
                             player.getGold()
@@ -53,11 +46,13 @@ public class StatusPanel extends JTextArea {
             // Enemy status details
             statusTextBuilder.append(
                     String.format(
-                            "--- Enemy Status ---\n" +
-                                    "Level: %d\n" +
-                                    "HP: %d\n" +
-                                    "Attack Damage: %d\n" +
-                                    "Attack Cooldown: %d\n",
+                            """
+                                    --- Enemy Status ---
+                                    Level: %d
+                                    HP: %d
+                                    Attack Damage: %d
+                                    Attack Cooldown: %d
+                                    """,
                             currentLevel,
                             enemy.getHealthPoints(),
                             enemy.getAttackDamage(),

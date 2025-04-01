@@ -3,8 +3,13 @@ package main.java.fr.ynov.ortalab.gui.panels;
 import main.java.fr.ynov.ortalab.domain.game.managers.GameManager;
 import main.java.fr.ynov.ortalab.gui.frames.DeckViewFrame;
 
-import javax.swing.*;
-import java.awt.*;
+import javax.swing.JPanel;
+import javax.swing.JButton;
+import javax.swing.BoxLayout;
+import javax.swing.Box;
+import java.awt.Dimension;
+import java.awt.Component;
+import java.awt.Color;
 
 public class SortButtonPanel extends JPanel {
     private final HandPanel handPanel;
@@ -39,7 +44,7 @@ public class SortButtonPanel extends JPanel {
     }
 
     private JButton createSortByValueButton() {
-        JButton button = new JButton("Valeur");
+        JButton button = new JButton("Values");
         button.setAlignmentX(Component.CENTER_ALIGNMENT);
         button.addActionListener(e -> {
             handPanel.sortHand(HandPanel.SortType.VALUE);
@@ -49,7 +54,7 @@ public class SortButtonPanel extends JPanel {
     }
 
     private JButton createSortBySuitButton() {
-        JButton button = new JButton("Couleur");
+        JButton button = new JButton("Colors");
         button.setAlignmentX(Component.CENTER_ALIGNMENT);
         button.addActionListener(e -> {
             handPanel.sortHand(HandPanel.SortType.SUIT);

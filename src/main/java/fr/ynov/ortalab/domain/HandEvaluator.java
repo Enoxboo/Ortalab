@@ -59,7 +59,7 @@ public class HandEvaluator {
         usedCards.clear();
         coreCards.clear();
 
-        // Try each checker in order (from highest rank to lowest)
+        // Try each checker in order (from the highest rank to lowest)
         for (HandChecker checker : checkers) {
             if (checker.checkHand(cards, usedCards, coreCards)) {
                 handType = checker.getHandType();

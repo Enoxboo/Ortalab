@@ -13,7 +13,6 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.stream.Collectors;
 
-
 /**
  * Utility class for poker hand evaluation operations
  */

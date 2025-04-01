@@ -5,10 +5,11 @@ import main.java.fr.ynov.ortalab.domain.exceptions.DeckException;
 import main.java.fr.ynov.ortalab.domain.game.managers.GameManager;
 import main.java.fr.ynov.ortalab.gui.buttons.CardButton;
 
-import javax.swing.*;
-import java.awt.*;
+import javax.swing.JPanel;
+import javax.swing.AbstractButton;
+import java.awt.FlowLayout;
 import java.util.ArrayList;
-import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
 public class HandPanel extends JPanel {
@@ -100,10 +101,6 @@ public class HandPanel extends JPanel {
         sortHand(currentSortType);
     }
 
-    public List<Card> getPlayerHand() {
-        return Collections.unmodifiableList(playerHand);
-    }
-
     public void sortHand(SortType sortType) {
         // Update the current sort type
         this.currentSortType = sortType;
@@ -111,23 +108,16 @@ public class HandPanel extends JPanel {
         // Sort the cards based on the selected type
         switch (sortType) {
             case VALUE:
-                playerHand.sort((c1, c2) ->
-                        Integer.compare(c1.value().getNumericValue(), c2.value().getNumericValue()));
+                playerHand.sort(Comparator.comparingInt(c -> c.value().getNumericValue()));
                 break;
             case SUIT:
-                playerHand.sort((c1, c2) -> {
-                    int suitCompare = c1.suit().compareTo(c2.suit());
-                    if (suitCompare != 0) return suitCompare;
-                    return Integer.compare(c1.value().getNumericValue(), c2.value().getNumericValue());
-                });
+                playerHand.sort(Comparator.comparing(Card::suit).thenComparingInt(c -> c.value().getNumericValue()));
                 break;
         }
 
         // Refresh the hand display
         initializeHand();
     }
-
-
 
     public void addCardSelectionListener(Runnable listener) {
         selectionListeners.add(listener);

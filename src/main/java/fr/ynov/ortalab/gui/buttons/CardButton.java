@@ -3,8 +3,14 @@ package main.java.fr.ynov.ortalab.gui.buttons;
 import main.java.fr.ynov.ortalab.domain.card.Card;
 import main.java.fr.ynov.ortalab.domain.card.CardSuit;
 
-import javax.swing.*;
-import java.awt.*;
+
+import javax.swing.JToggleButton;
+import java.awt.Dimension;
+import java.awt.Font;
+import java.awt.Color;
+import java.awt.Graphics;
+import java.awt.Graphics2D;
+import java.awt.RenderingHints;
 import java.util.Optional;
 
 public class CardButton extends JToggleButton {
@@ -15,7 +21,7 @@ public class CardButton extends JToggleButton {
     private static final Color RED_SUIT_COLOR = Color.RED;
     private static final Color BLACK_SUIT_COLOR = Color.BLACK;
     private static final int CORNER_RADIUS = 20;
-    private static final Color SELECTION_COLOR = new Color(173, 216, 230, 150); // Light blue with transparency
+    private static final Color SELECTION_COLOR = new Color(173, 216, 230, 150);
 
     public CardButton(Card card) {
         super(card != null ? card.toShortString() : "");
@@ -30,16 +36,11 @@ public class CardButton extends JToggleButton {
         setBackground(Color.WHITE);
         setFont(CARD_FONT);
 
-        // Safely set foreground color
         setForeground(determineForegroundColor());
     }
 
     public Color determineForegroundColor() {
-        return Optional.ofNullable(card)
-                .map(c -> (c.suit() == CardSuit.HEARTS || c.suit() == CardSuit.DIAMONDS)
-                        ? RED_SUIT_COLOR
-                        : BLACK_SUIT_COLOR)
-                .orElse(BLACK_SUIT_COLOR);
+        return Optional.ofNullable(card).filter(c -> (c.suit() == CardSuit.HEARTS || c.suit() == CardSuit.DIAMONDS)).map(c -> RED_SUIT_COLOR).orElse(BLACK_SUIT_COLOR);
     }
 
     public Card getCard() {

@@ -2,8 +2,14 @@ package main.java.fr.ynov.ortalab.gui.components;
 
 import main.java.fr.ynov.ortalab.domain.game.Item;
 
-import javax.swing.*;
-import java.awt.*;
+import javax.swing.JPanel;
+import javax.swing.JToolTip;
+import java.awt.Dimension;
+import java.awt.Color;
+import java.awt.Graphics;
+import java.awt.Graphics2D;
+import java.awt.RenderingHints;
+import java.awt.BasicStroke;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
@@ -70,19 +76,18 @@ public class CircleItemSlot extends JPanel {
     private String getEffectTypeDescription() {
         if (item == null) return "";
 
-        switch (item.getType()) {
-            case SUIT_DAMAGE:
+        return switch (item.getType()) {
+            case SUIT_DAMAGE -> {
                 if (item.getName().equals("The Moon")) {
-                    return "Clubs damage bonus";
+                    yield "Clubs damage bonus";
                 } else if (item.getName().equals("The Sun")) {
-                    return "Diamonds damage bonus";
+                    yield "Diamonds damage bonus";
                 }
-                return "Suit damage bonus";
-            case HAND_TYPE_DAMAGE:
-                return "Flush damage bonus";
-            default:
-                return "Unknown effect";
-        }
+                yield "Suit damage bonus";
+            }
+            case HAND_TYPE_DAMAGE -> "Flush damage bonus";
+            default -> "Unknown effect";
+        };
     }
 
     public void setMouseListener(Consumer<MouseEvent> clickHandler) {

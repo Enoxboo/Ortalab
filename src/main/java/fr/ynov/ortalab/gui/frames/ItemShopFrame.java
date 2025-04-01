@@ -7,8 +7,20 @@ import main.java.fr.ynov.ortalab.domain.game.managers.GameManager;
 import main.java.fr.ynov.ortalab.gui.components.CircleItemSlot;
 import main.java.fr.ynov.ortalab.gui.components.ShopItemPanel;
 
-import javax.swing.*;
-import java.awt.*;
+import javax.swing.JFrame;
+import javax.swing.JPanel;
+import javax.swing.JLabel;
+import javax.swing.JButton;
+import javax.swing.JOptionPane;
+import javax.swing.Box;
+import javax.swing.SwingUtilities;
+import javax.swing.BorderFactory;
+import javax.swing.BoxLayout;
+import java.awt.Dimension;
+import java.awt.Font;
+import java.awt.BorderLayout;
+import java.awt.GridLayout;
+import java.awt.FlowLayout;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.util.ArrayList;
@@ -90,9 +102,7 @@ public class ItemShopFrame extends JFrame {
             itemPanel.setPreferredSize(new Dimension(200, 250));
 
             // Add buy button action listener
-            itemPanel.addBuyButtonListener(e -> {
-                handleItemPurchase(itemPanel);
-            });
+            itemPanel.addBuyButtonListener(e -> handleItemPurchase(itemPanel));
 
             shopItemPanels.add(itemPanel);
             itemsPanel.add(itemPanel);

@@ -1,7 +1,6 @@
 package main.java.fr.ynov.ortalab.domain.game;
 
 import java.util.function.Consumer;
-import java.util.function.Function;
 
 public class Item {
     private final String name;
@@ -24,26 +23,19 @@ public class Item {
     }
 
     public enum ItemRarity {
-        COMMON(0.6f, 1.0f),
-        UNCOMMON(0.3f, 1.5f),
-        RARE(0.1f, 2.0f),
-        LEGENDARY(0.01f, 3.0f);
+        COMMON(0.7f),
+        RARE(0.3f);
 
         private final float dropRate;
-        private final float valueMultiplier;
 
-        ItemRarity(float dropRate, float valueMultiplier) {
+        ItemRarity(float dropRate) {
             this.dropRate = dropRate;
-            this.valueMultiplier = valueMultiplier;
         }
 
         public float getDropRate() {
             return dropRate;
         }
 
-        public float getValueMultiplier() {
-            return valueMultiplier;
-        }
     }
 
     private Item(Builder builder) {

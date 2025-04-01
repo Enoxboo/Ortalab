@@ -5,7 +5,9 @@ import main.java.fr.ynov.ortalab.domain.card.CardValue;
 import main.java.fr.ynov.ortalab.domain.HandType;
 import main.java.fr.ynov.ortalab.domain.utils.HandUtils;
 
-import java.util.*;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 public class TwoPairsChecker implements HandChecker {
 

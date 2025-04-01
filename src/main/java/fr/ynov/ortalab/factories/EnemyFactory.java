@@ -10,7 +10,7 @@ import java.util.Random;
 
 public class EnemyFactory {
     private static final Random random = new Random();
-    private Map<Integer, List<EnemyType>> enemyTypes = new HashMap<>();
+    private final Map<Integer, List<EnemyType>> enemyTypes = new HashMap<>();
 
     public EnemyFactory() {
         initializeEnemyTypes();
@@ -47,23 +47,10 @@ public class EnemyFactory {
             throw new IllegalArgumentException("No enemy types found for level " + level);
         }
         EnemyType selectedType = levelEnemyTypes.get(random.nextInt(levelEnemyTypes.size()));
-        return new Enemy(selectedType.getHealth(), selectedType.getAttackDamage(), selectedType.getCooldown());
+        return new Enemy(selectedType.health(), selectedType.attackDamage(), selectedType.cooldown());
     }
 
     // Inner class to define enemy templates
-    private static class EnemyType {
-        private final int health;
-        private final int attackDamage;
-        private final int cooldown;
-
-        public EnemyType(int health, int attackDamage, int cooldown) {
-            this.health = health;
-            this.attackDamage = attackDamage;
-            this.cooldown = cooldown;
-        }
-
-        public int getHealth() { return health; }
-        public int getAttackDamage() { return attackDamage; }
-        public int getCooldown() { return cooldown; }
+        private record EnemyType(int health, int attackDamage, int cooldown) {
     }
 }

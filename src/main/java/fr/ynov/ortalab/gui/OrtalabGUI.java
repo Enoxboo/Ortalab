@@ -2,10 +2,9 @@ package main.java.fr.ynov.ortalab.gui;
 
 import main.java.fr.ynov.ortalab.domain.exceptions.DeckException;
 import main.java.fr.ynov.ortalab.domain.game.managers.GameManager;
-import main.java.fr.ynov.ortalab.gui.frames.ItemShopFrame;
 import main.java.fr.ynov.ortalab.gui.frames.MainGameFrame;
 
-import javax.swing.*;
+import javax.swing.JOptionPane;
 
 public class OrtalabGUI {
     public static void main(String[] args) throws DeckException {

@@ -2,7 +2,6 @@ package main.java.fr.ynov.ortalab.domain.game;
 
 import main.java.fr.ynov.ortalab.factories.ItemFactory;
 
-import java.util.ArrayList;
 import java.util.List;
 
 public class ItemShop {

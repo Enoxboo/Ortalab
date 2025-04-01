@@ -6,8 +6,13 @@ import main.java.fr.ynov.ortalab.domain.card.CardValue;
 import main.java.fr.ynov.ortalab.domain.game.Deck;
 import main.java.fr.ynov.ortalab.gui.buttons.CardButton;
 
-import javax.swing.*;
-import java.awt.*;
+import javax.swing.JFrame;
+import javax.swing.JPanel;
+import javax.swing.BorderFactory;
+import javax.swing.JScrollPane;
+import java.awt.Dimension;
+import java.awt.GridLayout;
+import java.awt.Color;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
@@ -46,7 +51,7 @@ public class DeckViewFrame extends JFrame {
     }
 
     private CardButton createCardButton(Card card) {
-        CardButton cardButton = new CardButton(card) {
+        return new CardButton(card) {
             @Override
             protected void setupButtonAppearance() {
                 super.setupButtonAppearance();
@@ -56,7 +61,6 @@ public class DeckViewFrame extends JFrame {
                 setEnabled(false);
             }
         };
-        return cardButton;
     }
 
     public void updateDeckView() {

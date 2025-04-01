@@ -6,8 +6,8 @@ import java.util.function.Consumer;
 
 public class Enemy {
     private int healthPoints;
-    private int attackDamage;
-    private int attackCooldown;
+    private final int attackDamage;
+    private final int attackCooldown;
     private int currentCooldown;
 
     public Enemy(int healthPoints, int attackDamage, int attackCooldown) {

@@ -5,11 +5,23 @@ import main.java.fr.ynov.ortalab.domain.game.managers.GameManager;
 import main.java.fr.ynov.ortalab.domain.game.Enemy;
 import main.java.fr.ynov.ortalab.domain.game.Player;
 import main.java.fr.ynov.ortalab.gui.panels.*;
-import main.java.fr.ynov.ortalab.domain.PointsCalculator;
 import main.java.fr.ynov.ortalab.domain.game.managers.GameManager.GameState;
 
-import javax.swing.*;
-import java.awt.*;
+import javax.swing.JFrame;
+import javax.swing.JPanel;
+import javax.swing.JLabel;
+import javax.swing.JButton;
+import javax.swing.JScrollPane;
+import javax.swing.Box;
+import javax.swing.SwingUtilities;
+import javax.swing.Timer;
+import javax.swing.SwingConstants;
+import java.awt.Dimension;
+import java.awt.Component;
+import java.awt.Font;
+import java.awt.BorderLayout;
+import java.awt.GridLayout;
+import java.awt.FlowLayout;
 
 public class MainGameFrame extends JFrame {
     private final GameManager gameManager;
@@ -117,7 +129,7 @@ public class MainGameFrame extends JFrame {
     }
 
     private JButton createTutorialButton() {
-        JButton tutorialButton = new JButton("Tutoriel");
+        JButton tutorialButton = new JButton("Tutorial");
         tutorialButton.setAlignmentX(Component.CENTER_ALIGNMENT);
         tutorialButton.addActionListener(e -> TutorialFrame.showTutorial());
         return tutorialButton;
@@ -167,7 +179,7 @@ public class MainGameFrame extends JFrame {
 
     public static void launch(GameManager gameManager) {
         SwingUtilities.invokeLater(() -> {
-            MainGameFrame frame = null;
+            MainGameFrame frame;
             try {
                 frame = new MainGameFrame(gameManager);
             } catch (DeckException e) {

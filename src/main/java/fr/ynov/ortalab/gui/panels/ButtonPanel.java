@@ -4,7 +4,11 @@ import main.java.fr.ynov.ortalab.domain.card.Card;
 import main.java.fr.ynov.ortalab.domain.HandEvaluator;
 import main.java.fr.ynov.ortalab.domain.game.managers.GameManager;
 
-import javax.swing.*;
+import javax.swing.JPanel;
+import javax.swing.JLabel;
+import javax.swing.JButton;
+import javax.swing.BoxLayout;
+import javax.swing.JOptionPane;
 import java.util.List;
 
 public class ButtonPanel extends JPanel {

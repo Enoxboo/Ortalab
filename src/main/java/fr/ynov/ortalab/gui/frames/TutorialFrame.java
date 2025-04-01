@@ -1,7 +1,17 @@
 package main.java.fr.ynov.ortalab.gui.frames;
 
-import javax.swing.*;
-import java.awt.*;
+import javax.swing.JFrame;
+import javax.swing.JPanel;
+import javax.swing.JButton;
+import javax.swing.JTextArea;
+import javax.swing.JScrollPane;
+import javax.swing.BoxLayout;
+import javax.swing.Box;
+import javax.swing.BorderFactory;
+import javax.swing.SwingUtilities;
+import java.awt.Dimension;
+import java.awt.Component;
+import java.awt.Font;
 
 public class TutorialFrame extends JFrame {
     public TutorialFrame() {
@@ -17,41 +27,13 @@ public class TutorialFrame extends JFrame {
         tutorialPanel.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
 
         // Tutorial text areas
-        JTextArea titleArea = new JTextArea("Ortalab - Jeu de Cartes et de Combat");
+        JTextArea titleArea = new JTextArea("Ortalab");
         titleArea.setFont(new Font("Arial", Font.BOLD, 20));
         titleArea.setEditable(false);
         titleArea.setMaximumSize(new Dimension(Integer.MAX_VALUE, 50));
         titleArea.setAlignmentX(Component.CENTER_ALIGNMENT);
 
-        JTextArea tutorialTextArea = new JTextArea(
-                "Bienvenue dans Ortalab, un jeu de combat par cartes !\n\n" +
-                        "Objectif du Jeu :\n" +
-                        "- Vaincre des ennemis en formant les meilleures mains de poker\n" +
-                        "- Progresser à travers différents niveaux\n\n" +
-                        "Mécaniques de Jeu :\n" +
-                        "1. Début du Combat\n" +
-                        "   - Vous commencez avec 8 cartes\n" +
-                        "   - Sélectionnez 5 cartes pour former votre main\n\n" +
-                        "2. Défausse\n" +
-                        "   - Vous avez 3 défausses maximum (par ennemis)\n" +
-                        "   - Utilisez-les pour optimiser votre main\n" +
-                        "   - Choisissez stratégiquement quelles cartes défausser\n\n" +
-                        "3. Évaluation de la Main\n" +
-                        "   - Les combinaisons de poker influencent les dégâts\n" +
-                        "   - Plus votre main est forte, plus les dégâts sont élevés\n" +
-                        "   - Si vous jouez une main qui ne nécessite pas 5 cartes, vous pouvez rajouter des cartes poubelles, elles ne conteront pas dans le calcul de dégâts mais elle seront défaussées gratuitement\n\n" +
-                        "4. Combat\n" +
-                        "   - Infligez des dégâts à l'ennemi avec votre main\n" +
-                        "   - L'ennemi riposte à intervalles réguliers\n\n" +
-                        "5. Progression\n" +
-                        "   - Gagnez de l'or en combattant\n" +
-                        "   - Achetez des objets dans les boutiques\n" +
-                        "   - Atteignez le boss final !\n\n"
-        );
-        tutorialTextArea.setFont(new Font("Arial", Font.PLAIN, 14));
-        tutorialTextArea.setEditable(false);
-        tutorialTextArea.setLineWrap(true);
-        tutorialTextArea.setWrapStyleWord(true);
+        final JTextArea tutorialTextArea = getJTextArea();
 
         // Add components to panel
         tutorialPanel.add(titleArea);
@@ -59,7 +41,7 @@ public class TutorialFrame extends JFrame {
         tutorialPanel.add(new JScrollPane(tutorialTextArea));
 
         // Add close button
-        JButton closeButton = new JButton("Fermer");
+        JButton closeButton = new JButton("Close");
         closeButton.setAlignmentX(Component.CENTER_ALIGNMENT);
         closeButton.addActionListener(e -> dispose());
 
@@ -68,6 +50,48 @@ public class TutorialFrame extends JFrame {
 
         // Add panel to frame
         add(tutorialPanel);
+    }
+
+    private static JTextArea getJTextArea() {
+        JTextArea tutorialTextArea = new JTextArea(
+                """
+                         Welcome to Ortalab, a card-based combat game!
+                        \s
+                         Game objective:
+                         - Defeat enemies by forming the best poker hands
+                         - Progress through different levels
+                        \s
+                         Game mechanics :
+                         1. Starting the fight
+                            - You start with 8 cards
+                            - Select 5 cards to form your hand
+                        \s
+                         2. Discard
+                            - You have a maximum of 3 discards (per enemy).
+                            - Use them to optimize your hand
+                            - Strategically choose which cards to discard
+                        \s
+                         3. Hand evaluation
+                            - Poker combinations influence damage
+                            - The stronger your hand, the higher the damage
+                            - If you're playing a hand that doesn't require 5 cards, you can add garbage cards. They won't count towards damage, but will be discarded for free.
+                        \s
+                         4. Combat
+                            - Inflict damage on the enemy with your hand
+                            - Enemy strikes back at regular intervals
+                        \s
+                         5. Progress
+                            - Earn gold in battle
+                            - Buy items in the stores
+                            - Reach the final boss!
+                        
+                        """
+        );
+        tutorialTextArea.setFont(new Font("Arial", Font.PLAIN, 14));
+        tutorialTextArea.setEditable(false);
+        tutorialTextArea.setLineWrap(true);
+        tutorialTextArea.setWrapStyleWord(true);
+        return tutorialTextArea;
     }
 
     public static void showTutorial() {

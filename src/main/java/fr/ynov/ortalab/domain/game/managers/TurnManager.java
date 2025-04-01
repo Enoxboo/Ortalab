@@ -10,10 +10,10 @@ import main.java.fr.ynov.ortalab.domain.game.managers.GameManager.GameState;
 import java.util.List;
 
 public class TurnManager {
-    private Player player;
-    private EncounterManager encounterManager;
+    private final Player player;
+    private final EncounterManager encounterManager;
     private GameState currentGameState;
-    private Deck gameDeck;
+    private final Deck gameDeck;
 
     public TurnManager(Player player, EncounterManager encounterManager, Deck gameDeck) {
         this.player = player;

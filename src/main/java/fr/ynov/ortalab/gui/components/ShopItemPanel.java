@@ -2,8 +2,21 @@ package main.java.fr.ynov.ortalab.gui.components;
 
 import main.java.fr.ynov.ortalab.domain.game.Item;
 
-import javax.swing.*;
-import java.awt.*;
+import javax.swing.JPanel;
+import javax.swing.JLabel;
+import javax.swing.JButton;
+import javax.swing.Box;
+import javax.swing.BorderFactory;
+import javax.swing.BoxLayout;
+import javax.swing.SwingConstants;
+import java.awt.Dimension;
+import java.awt.Font;
+import java.awt.Color;
+import java.awt.Graphics;
+import java.awt.Graphics2D;
+import java.awt.RenderingHints;
+import java.awt.BasicStroke;
+import java.awt.Component;
 import java.awt.event.ActionListener;
 
 public class ShopItemPanel extends JPanel {
@@ -106,19 +119,18 @@ public class ShopItemPanel extends JPanel {
     private String getEffectTypeDescription() {
         if (item == null) return "";
 
-        switch (item.getType()) {
-            case SUIT_DAMAGE:
+        return switch (item.getType()) {
+            case SUIT_DAMAGE -> {
                 if (item.getName().equals("The Moon")) {
-                    return "Clubs damage";
+                    yield "Clubs damage";
                 } else if (item.getName().equals("The Sun")) {
-                    return "Diamonds damage";
+                    yield "Diamonds damage";
                 }
-                return "Suit damage";
-            case HAND_TYPE_DAMAGE:
-                return "Flush damage";
-            default:
-                return "Unknown effect";
-        }
+                yield "Suit damage";
+            }
+            case HAND_TYPE_DAMAGE -> "Flush damage";
+            default -> "Unknown effect";
+        };
     }
 
     public void clearItem() {
