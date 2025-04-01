@@ -7,22 +7,12 @@ import java.util.function.Consumer;
 public class Item {
     private final String name;
     private final String description;
-    private final ItemType type;
     private final ItemRarity rarity;
     private final int value;
     private final int buyValue;
     private final int sellValue;
     private final Consumer<Player> applyEffect;
     private final Consumer<Player> removeEffect;
-
-    public enum ItemType {
-        SUIT_DAMAGE,
-        HAND_TYPE_DAMAGE,
-        HEALTH_BOOST,
-        GOLD_BOOST,
-        CRITICAL_CHANCE,
-        DISCARD_BOOST
-    }
 
     public enum ItemRarity {
         COMMON(0.7f),
@@ -37,13 +27,11 @@ public class Item {
         public float getDropRate() {
             return dropRate;
         }
-
     }
 
     private Item(Builder builder) {
         this.name = builder.name;
         this.description = builder.description;
-        this.type = builder.type;
         this.rarity = builder.rarity;
         this.value = builder.value;
         this.buyValue = builder.buyValue;
@@ -72,10 +60,6 @@ public class Item {
         return description;
     }
 
-    public ItemType getType() {
-        return type;
-    }
-
     public ItemRarity getRarity() {
         return rarity;
     }
@@ -92,11 +76,9 @@ public class Item {
         return sellValue;
     }
 
-    // Builder pattern for creating items
     public static class Builder {
         private final String name;
         private String description;
-        private final ItemType type;
         private ItemRarity rarity = ItemRarity.COMMON;
         private int value;
         private int buyValue;
@@ -104,9 +86,8 @@ public class Item {
         private Consumer<Player> applyEffect;
         private Consumer<Player> removeEffect;
 
-        public Builder(String name, ItemType type) {
+        public Builder(String name) {
             this.name = name;
-            this.type = type;
         }
 
         public Builder description(String description) {

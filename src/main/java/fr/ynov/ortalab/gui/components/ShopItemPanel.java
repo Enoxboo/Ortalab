@@ -103,9 +103,9 @@ public class ShopItemPanel extends JPanel {
             nameLabel.setText(item.getName());
 
             // Format effect description based on item type
-            String effectType = getEffectTypeDescription();
+            String effectType = item.getDescription();
             String effectValue = "+" + item.getValue();
-            effectLabel.setText(effectType + ": " + effectValue);
+            effectLabel.setText("<html><div style='text-align:center;'>" + item.getDescription());
 
             costLabel.setText("Cost: " + item.getBuyValue() + " gold");
             buyButton.setEnabled(true);
@@ -114,23 +114,6 @@ public class ShopItemPanel extends JPanel {
         }
 
         repaint();
-    }
-
-    private String getEffectTypeDescription() {
-        if (item == null) return "";
-
-        return switch (item.getType()) {
-            case SUIT_DAMAGE -> {
-                if (item.getName().equals("The Moon")) {
-                    yield "Clubs damage";
-                } else if (item.getName().equals("The Sun")) {
-                    yield "Diamonds damage";
-                }
-                yield "Suit damage";
-            }
-            case HAND_TYPE_DAMAGE -> "Flush damage";
-            default -> "Unknown effect";
-        };
     }
 
     public void clearItem() {

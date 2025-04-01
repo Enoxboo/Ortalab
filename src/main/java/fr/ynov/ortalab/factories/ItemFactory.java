@@ -1,5 +1,6 @@
 package main.java.fr.ynov.ortalab.factories;
 
+import main.java.fr.ynov.ortalab.config.GameConfig;
 import main.java.fr.ynov.ortalab.domain.game.Item;
 import main.java.fr.ynov.ortalab.domain.card.CardSuit;
 
@@ -23,11 +24,11 @@ public class ItemFactory {
 
     private static void registerItems() {
         // Suit damage items
-        registerItem("The Moon", () -> new Item.Builder("The Moon", Item.ItemType.SUIT_DAMAGE)
+        registerItem("The Moon", () -> new Item.Builder("The Moon")
                 .description("Increases damage of Clubs cards by 15")
                 .rarity(Item.ItemRarity.COMMON)
                 .value(15)
-                .buyValue(6)
+                .buyValue(GameConfig.ITEM_SELL_PRICE)
                 .effect(
                         player -> player.getSuitDamageBonus().put(CardSuit.CLUBS,
                                 player.getSuitDamageBonus().getOrDefault(CardSuit.CLUBS, 0) + 15),
@@ -39,11 +40,27 @@ public class ItemFactory {
                 )
                 .build());
 
-        registerItem("The Sun", () -> new Item.Builder("The Sun", Item.ItemType.SUIT_DAMAGE)
+        registerItem("The Sun", () -> new Item.Builder("The Sun")
                 .description("Increases damage of Diamonds cards by 15")
                 .rarity(Item.ItemRarity.COMMON)
                 .value(15)
-                .buyValue(6)
+                .buyValue(GameConfig.ITEM_SELL_PRICE)
+                .effect(
+                        player -> player.getSuitDamageBonus().put(CardSuit.DIAMONDS,
+                                player.getSuitDamageBonus().getOrDefault(CardSuit.DIAMONDS, 0) + 15),
+                        player -> {
+                            Map<CardSuit, Integer> bonuses = player.getSuitDamageBonus();
+                            bonuses.put(CardSuit.DIAMONDS, bonuses.getOrDefault(CardSuit.DIAMONDS, 0) - 15);
+                            if (bonuses.get(CardSuit.DIAMONDS) <= 0) bonuses.remove(CardSuit.DIAMONDS);
+                        }
+                )
+                .build());
+
+        registerItem("Isolation", () -> new Item.Builder("Isolation")
+                .description("High Card Attacks deal +40 damage.")
+                .rarity(Item.ItemRarity.COMMON)
+                .value(40)
+                .buyValue(GameConfig.ITEM_SELL_PRICE)
                 .effect(
                         player -> player.getSuitDamageBonus().put(CardSuit.DIAMONDS,
                                 player.getSuitDamageBonus().getOrDefault(CardSuit.DIAMONDS, 0) + 15),

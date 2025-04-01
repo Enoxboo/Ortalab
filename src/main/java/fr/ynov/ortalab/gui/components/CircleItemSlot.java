@@ -60,7 +60,7 @@ public class CircleItemSlot extends JPanel {
             StringBuilder tooltipText = new StringBuilder("<html>");
             tooltipText.append("<b>").append(item.getName()).append("</b><br>");
 
-            String effectType = getEffectTypeDescription();
+            String effectType = item.getDescription();
             String effectValue = "+" + item.getValue();
 
             tooltipText.append(effectType).append(": ").append(effectValue);
@@ -71,23 +71,6 @@ public class CircleItemSlot extends JPanel {
         } else {
             setToolTipText("Empty Slot");
         }
-    }
-
-    private String getEffectTypeDescription() {
-        if (item == null) return "";
-
-        return switch (item.getType()) {
-            case SUIT_DAMAGE -> {
-                if (item.getName().equals("The Moon")) {
-                    yield "Clubs damage bonus";
-                } else if (item.getName().equals("The Sun")) {
-                    yield "Diamonds damage bonus";
-                }
-                yield "Suit damage bonus";
-            }
-            case HAND_TYPE_DAMAGE -> "Flush damage bonus";
-            default -> "Unknown effect";
-        };
     }
 
     public void setMouseListener(Consumer<MouseEvent> clickHandler) {
