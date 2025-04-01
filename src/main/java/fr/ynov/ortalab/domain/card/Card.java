@@ -1,4 +1,4 @@
-package main.java.fr.ynov.ortalab.domain;
+package main.java.fr.ynov.ortalab.domain.card;
 
 public record Card(CardValue value, CardSuit suit) {
 

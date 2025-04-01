@@ -1,4 +1,4 @@
-package main.java.fr.ynov.ortalab.domain;
+package main.java.fr.ynov.ortalab.domain.card;
 
 /**
  * Enumeration representing the four suits of a standard deck of cards.

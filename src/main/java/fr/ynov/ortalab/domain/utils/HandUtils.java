@@ -1,8 +1,8 @@
 package main.java.fr.ynov.ortalab.domain.utils;
 
-import main.java.fr.ynov.ortalab.domain.Card;
-import main.java.fr.ynov.ortalab.domain.CardSuit;
-import main.java.fr.ynov.ortalab.domain.CardValue;
+import main.java.fr.ynov.ortalab.domain.card.Card;
+import main.java.fr.ynov.ortalab.domain.card.CardSuit;
+import main.java.fr.ynov.ortalab.domain.card.CardValue;
 
 import java.util.List;
 import java.util.Map;

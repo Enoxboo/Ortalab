@@ -1,5 +1,7 @@
 package main.java.fr.ynov.ortalab.domain;
 
+import main.java.fr.ynov.ortalab.domain.card.Card;
+import main.java.fr.ynov.ortalab.domain.card.CardSuit;
 import main.java.fr.ynov.ortalab.domain.game.Player;
 
 import java.util.List;

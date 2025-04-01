@@ -1,8 +1,8 @@
 package main.java.fr.ynov.ortalab.domain.game;
 
 import main.java.fr.ynov.ortalab.config.GameConfig;
-import main.java.fr.ynov.ortalab.domain.Card;
-import main.java.fr.ynov.ortalab.domain.CardSuit;
+import main.java.fr.ynov.ortalab.domain.card.Card;
+import main.java.fr.ynov.ortalab.domain.card.CardSuit;
 import main.java.fr.ynov.ortalab.domain.HandType;
 import main.java.fr.ynov.ortalab.domain.PointsCalculator;
 import main.java.fr.ynov.ortalab.domain.exceptions.DeckException;
@@ -16,11 +16,10 @@ import java.util.Map;
 
 public class Player {
     private int healthPoints;
-    private int maxHealthPoints;
+    private final int maxHealthPoints;
     private int gold;
     private int discardCount;
     private int totalDiscardCount;
-    private final int MAX_DISCARDS = GameConfig.MAX_DISCARDS_PER_ENEMY;
     private final int MAX_HAND_SIZE = GameConfig.MAX_HAND_SIZE;
     private final int ACTIVE_HAND_SIZE = GameConfig.ACTIVE_HAND_SIZE;
     private final int MAX_DISCARDS_PER_ENEMY = GameConfig.MAX_DISCARDS_PER_ENEMY;

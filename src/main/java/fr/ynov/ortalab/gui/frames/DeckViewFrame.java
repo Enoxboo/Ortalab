@@ -1,8 +1,8 @@
 package main.java.fr.ynov.ortalab.gui.frames;
 
-import main.java.fr.ynov.ortalab.domain.Card;
-import main.java.fr.ynov.ortalab.domain.CardSuit;
-import main.java.fr.ynov.ortalab.domain.CardValue;
+import main.java.fr.ynov.ortalab.domain.card.Card;
+import main.java.fr.ynov.ortalab.domain.card.CardSuit;
+import main.java.fr.ynov.ortalab.domain.card.CardValue;
 import main.java.fr.ynov.ortalab.domain.game.Deck;
 import main.java.fr.ynov.ortalab.gui.buttons.CardButton;
 
@@ -11,7 +11,6 @@ import java.awt.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 public class DeckViewFrame extends JFrame {
     private final Deck deck;

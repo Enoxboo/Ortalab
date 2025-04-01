@@ -5,8 +5,7 @@ import main.java.fr.ynov.ortalab.domain.exceptions.DeckException;
 import main.java.fr.ynov.ortalab.domain.game.Player;
 import main.java.fr.ynov.ortalab.domain.game.Deck;
 import main.java.fr.ynov.ortalab.domain.game.Enemy;
-
-import java.util.Random;
+import main.java.fr.ynov.ortalab.factories.EnemyFactory;
 
 public class EncounterManager {
     private final Player player;
@@ -14,17 +13,15 @@ public class EncounterManager {
     private Enemy currentEnemy;
     private int currentLevel;
     private static final int FINAL_BOSS_LEVEL = GameConfig.FINAL_BOSS_LEVEL;
-    private static final Random random = new Random();
-    private final EnemyPool enemyPool;
+    private final EnemyFactory enemyFactory;
 
-    // Add shop levels as constants
-    private static final int[] SHOP_LEVELS = {1, 3};
+    private static final int[] SHOP_LEVELS = GameConfig.SHOP_LEVELS;
 
     public EncounterManager(Player player, Deck gameDeck) {
         this.player = player;
         this.gameDeck = gameDeck;
         this.currentLevel = 1;
-        this.enemyPool = new EnemyPool();
+        this.enemyFactory = new EnemyFactory();
     }
 
     public void startFirstEncounter() throws DeckException {
@@ -40,7 +37,7 @@ public class EncounterManager {
     }
 
     public Enemy createEnemy(int level) {
-        return enemyPool.getRandomEnemyForLevel(level);
+        return enemyFactory.createEnemyForLevel(level);
     }
 
     public void completeEncounter(boolean enemyDefeated) {

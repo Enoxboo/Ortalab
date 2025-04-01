@@ -1,8 +1,8 @@
 package main.java.fr.ynov.ortalab.domain.checkers;
 
-import main.java.fr.ynov.ortalab.domain.Card;
-import main.java.fr.ynov.ortalab.domain.CardSuit;
-import main.java.fr.ynov.ortalab.domain.CardValue;
+import main.java.fr.ynov.ortalab.domain.card.Card;
+import main.java.fr.ynov.ortalab.domain.card.CardSuit;
+import main.java.fr.ynov.ortalab.domain.card.CardValue;
 import main.java.fr.ynov.ortalab.domain.HandType;
 import main.java.fr.ynov.ortalab.domain.utils.HandUtils;
 

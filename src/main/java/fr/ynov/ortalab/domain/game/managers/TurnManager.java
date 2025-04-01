@@ -1,6 +1,6 @@
 package main.java.fr.ynov.ortalab.domain.game.managers;
 
-import main.java.fr.ynov.ortalab.domain.Card;
+import main.java.fr.ynov.ortalab.domain.card.Card;
 import main.java.fr.ynov.ortalab.domain.exceptions.DeckException;
 import main.java.fr.ynov.ortalab.domain.game.Player;
 import main.java.fr.ynov.ortalab.domain.game.Enemy;
@@ -32,31 +32,39 @@ public class TurnManager {
 
         discardUsedCards(selectedCards);
 
+        // If enemy HP is 0 or less, handle enemy defeat
         if (remainingEnemyHP <= 0) {
-            // Enemy is defeated
-            boolean shouldVisitShop = encounterManager.shouldVisitShop();
-
-            // Complete the encounter, which updates the level
-            encounterManager.completeEncounter(true);
-
-            if (encounterManager.isGameComplete()) {
-                currentGameState = GameState.VICTORY;
-                return;
-            }
-
-            // If we should visit the shop after this encounter
-            if (shouldVisitShop) {
-                currentGameState = GameState.SHOP_VISIT;
-                return;
-            }
-
-            // Otherwise start the next encounter
-            encounterManager.startEncounter();
-            player.resetDiscards();
-            currentGameState = GameState.SELECTING_HAND;
+            handleEnemyDefeated();
             return;
         }
+
+        // If enemy is still alive, process enemy turn
         processEnemyTurn(currentEnemy);
+    }
+
+    private void handleEnemyDefeated() throws DeckException {
+        // Check if we should visit the shop after this encounter
+        boolean shouldVisitShop = encounterManager.shouldVisitShop();
+
+        // Complete the encounter, which updates the level
+        encounterManager.completeEncounter(true);
+
+        // Check if the game is complete
+        if (encounterManager.isGameComplete()) {
+            currentGameState = GameState.VICTORY;
+            return;
+        }
+
+        // If we should visit the shop after this encounter
+        if (shouldVisitShop) {
+            currentGameState = GameState.SHOP_VISIT;
+            return;
+        }
+
+        // Otherwise start the next encounter
+        encounterManager.startEncounter();
+        player.resetDiscards();
+        currentGameState = GameState.SELECTING_HAND;
     }
 
     private void discardUsedCards(List<Card> usedCards) {

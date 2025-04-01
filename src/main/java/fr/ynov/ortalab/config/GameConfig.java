@@ -11,6 +11,8 @@ public class GameConfig {
     public static final int BASE_GOLD_REWARD = 5;
     public static final int GOLD_REWARD_MULTIPLIER = 5;
 
+    public static final int[] SHOP_LEVELS = {1, 3};
+
     // Prevent instantiation
     private GameConfig() {
         throw new AssertionError("Cannot instantiate configuration class");

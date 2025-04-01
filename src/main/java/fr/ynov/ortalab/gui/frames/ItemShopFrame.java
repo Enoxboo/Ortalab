@@ -158,10 +158,6 @@ public class ItemShopFrame extends JFrame {
             return;
         }
 
-        // Debug print
-        System.out.println("Attempting to purchase: " + item.getName() + " for " + item.getBuyValue() + " gold");
-        System.out.println("Current gold: " + player.getGold());
-
         // Check if player has enough gold
         if (player.getGold() < item.getBuyValue()) {
             JOptionPane.showMessageDialog(this,
@@ -184,9 +180,6 @@ public class ItemShopFrame extends JFrame {
         int buyValue = item.getBuyValue();
         player.addGold(-buyValue);
         player.addItem(item);
-
-        // Debug print
-        System.out.println("Purchase completed. New gold: " + player.getGold());
 
         // Remove item from shop display
         itemPanel.clearItem();
@@ -241,8 +234,6 @@ public class ItemShopFrame extends JFrame {
     }
 
     private void updateGoldDisplay() {
-        // Debug print
-        System.out.println("Updating gold display: " + player.getGold());
         goldLabel.setText("Gold: " + player.getGold());
     }
 

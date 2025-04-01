@@ -1,8 +1,7 @@
 package main.java.fr.ynov.ortalab.factories;
 
 import main.java.fr.ynov.ortalab.domain.game.Item;
-import main.java.fr.ynov.ortalab.domain.game.Player;
-import main.java.fr.ynov.ortalab.domain.CardSuit;
+import main.java.fr.ynov.ortalab.domain.card.CardSuit;
 import main.java.fr.ynov.ortalab.domain.HandType;
 
 import java.util.ArrayList;

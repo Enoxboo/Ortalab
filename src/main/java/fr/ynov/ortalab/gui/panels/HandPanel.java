@@ -1,6 +1,6 @@
 package main.java.fr.ynov.ortalab.gui.panels;
 
-import main.java.fr.ynov.ortalab.domain.Card;
+import main.java.fr.ynov.ortalab.domain.card.Card;
 import main.java.fr.ynov.ortalab.domain.exceptions.DeckException;
 import main.java.fr.ynov.ortalab.domain.game.managers.GameManager;
 import main.java.fr.ynov.ortalab.gui.buttons.CardButton;

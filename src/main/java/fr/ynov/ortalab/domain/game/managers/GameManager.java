@@ -1,7 +1,7 @@
 package main.java.fr.ynov.ortalab.domain.game.managers;
 
 import main.java.fr.ynov.ortalab.config.GameConfig;
-import main.java.fr.ynov.ortalab.domain.Card;
+import main.java.fr.ynov.ortalab.domain.card.Card;
 import main.java.fr.ynov.ortalab.domain.exceptions.CardOperationException;
 import main.java.fr.ynov.ortalab.domain.exceptions.DeckException;
 import main.java.fr.ynov.ortalab.domain.exceptions.PlayerActionException;
@@ -18,7 +18,6 @@ public class GameManager {
     private TurnManager turnManager;
     private GameState gameState;
     private static final int MAX_HAND_SIZE = GameConfig.MAX_HAND_SIZE;
-    private static final int ACTIVE_HAND_SIZE = GameConfig.ACTIVE_HAND_SIZE;
     private static final int INITIAL_PLAYER_HP = GameConfig.INITIAL_PLAYER_HP;
 
     public enum GameState {
