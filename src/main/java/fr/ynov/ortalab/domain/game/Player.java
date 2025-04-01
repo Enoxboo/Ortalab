@@ -164,7 +164,7 @@ public class Player {
     public boolean addItem(Item item) {
         if (inventory.size() < GameConfig.MAX_INVENTORY_SIZE) {
             inventory.add(item);
-            applyItemEffect(item);
+            item.applyTo(this); // Use the item's built-in effect
             return true;
         }
         return false;
@@ -180,7 +180,7 @@ public class Player {
     public boolean sellItem(Item item) {
         if (inventory.remove(item)) {
             gold += item.getSellValue();
-            removeItemEffect(item);
+            item.removeFrom(this); // Use the item's built-in removal effect
             return true;
         }
         return false;
