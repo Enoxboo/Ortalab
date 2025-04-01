@@ -1,5 +1,7 @@
 package main.java.fr.ynov.ortalab.domain.game;
 
+import main.java.fr.ynov.ortalab.config.GameConfig;
+
 import java.util.function.Consumer;
 
 public class Item {
@@ -92,9 +94,9 @@ public class Item {
 
     // Builder pattern for creating items
     public static class Builder {
-        private String name;
+        private final String name;
         private String description;
-        private ItemType type;
+        private final ItemType type;
         private ItemRarity rarity = ItemRarity.COMMON;
         private int value;
         private int buyValue;
@@ -124,12 +126,7 @@ public class Item {
 
         public Builder buyValue(int buyValue) {
             this.buyValue = buyValue;
-            this.sellValue = buyValue / 2;
-            return this;
-        }
-
-        public Builder sellValue(int sellValue) {
-            this.sellValue = sellValue;
+            this.sellValue = GameConfig.ITEM_SELL_PRICE;
             return this;
         }
 

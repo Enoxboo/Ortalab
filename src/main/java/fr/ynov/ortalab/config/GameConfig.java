@@ -6,6 +6,7 @@ public class GameConfig {
     public static final int ACTIVE_HAND_SIZE = 5;
     public static final int MAX_DISCARDS_PER_ENEMY = 3;
     public static final int MAX_INVENTORY_SIZE = 6;
+    public static final int ITEM_SELL_PRICE = 2;
 
     public static final int FINAL_BOSS_LEVEL = 5;
     public static final int BASE_GOLD_REWARD = 5;
