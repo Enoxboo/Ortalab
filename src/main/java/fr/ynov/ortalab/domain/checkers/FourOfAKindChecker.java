@@ -21,7 +21,7 @@ public class FourOfAKindChecker implements HandChecker {
 
         CardValue quadsValue = fourOfAKindValues.getFirst();
         List<Card> quadsCards = cards.stream()
-                .filter(card -> card.getValue() == quadsValue)
+                .filter(card -> card.value() == quadsValue)
                 .limit(4)
                 .toList();
 

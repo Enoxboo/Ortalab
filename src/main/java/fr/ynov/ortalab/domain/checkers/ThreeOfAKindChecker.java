@@ -21,7 +21,7 @@ public class ThreeOfAKindChecker implements HandChecker {
 
         CardValue tripValue = threeOfAKindValues.getFirst();
         List<Card> tripCards = cards.stream()
-                .filter(card -> card.getValue() == tripValue)
+                .filter(card -> card.value() == tripValue)
                 .limit(3)
                 .toList();
 

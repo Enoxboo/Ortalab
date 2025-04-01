@@ -18,7 +18,7 @@ public class FlushChecker implements HandChecker {
         for (Map.Entry<CardSuit, List<Card>> entry : suitGroups.entrySet()) {
             if (entry.getValue().size() >= 5) {
                 List<Card> flushCards = entry.getValue().stream()
-                        .sorted((c1, c2) -> c2.getValue().getNumericValue() - c1.getValue().getNumericValue())
+                        .sorted((c1, c2) -> c2.value().getNumericValue() - c1.value().getNumericValue())
                         .limit(5)
                         .toList();
 

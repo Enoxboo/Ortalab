@@ -112,13 +112,13 @@ public class HandPanel extends JPanel {
         switch (sortType) {
             case VALUE:
                 playerHand.sort((c1, c2) ->
-                        Integer.compare(c1.getValue().getNumericValue(), c2.getValue().getNumericValue()));
+                        Integer.compare(c1.value().getNumericValue(), c2.value().getNumericValue()));
                 break;
             case SUIT:
                 playerHand.sort((c1, c2) -> {
-                    int suitCompare = c1.getSuit().compareTo(c2.getSuit());
+                    int suitCompare = c1.suit().compareTo(c2.suit());
                     if (suitCompare != 0) return suitCompare;
-                    return Integer.compare(c1.getValue().getNumericValue(), c2.getValue().getNumericValue());
+                    return Integer.compare(c1.value().getNumericValue(), c2.value().getNumericValue());
                 });
                 break;
         }

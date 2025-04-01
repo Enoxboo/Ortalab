@@ -23,12 +23,12 @@ public class TwoPairsChecker implements HandChecker {
 
         // Add pairs to used and core cards
         List<Card> firstPairCards = cards.stream()
-                .filter(card -> card.getValue() == firstPairValue)
+                .filter(card -> card.value() == firstPairValue)
                 .limit(2)
                 .toList();
 
         List<Card> secondPairCards = cards.stream()
-                .filter(card -> card.getValue() == secondPairValue)
+                .filter(card -> card.value() == secondPairValue)
                 .limit(2)
                 .toList();
 

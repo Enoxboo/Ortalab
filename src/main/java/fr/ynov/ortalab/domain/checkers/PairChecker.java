@@ -22,7 +22,7 @@ public class PairChecker implements HandChecker {
         // Get highest pair
         CardValue pairValue = pairValues.getFirst();
         List<Card> pairCards = cards.stream()
-                .filter(card -> card.getValue() == pairValue)
+                .filter(card -> card.value() == pairValue)
                 .limit(2)
                 .toList();
 

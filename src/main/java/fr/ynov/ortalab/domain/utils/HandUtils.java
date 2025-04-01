@@ -27,7 +27,7 @@ public class HandUtils {
      */
     public static Map<CardValue, List<Card>> groupByValue(List<Card> cards) {
         return cards.stream()
-                .collect(Collectors.groupingBy(Card::getValue));
+                .collect(Collectors.groupingBy(Card::value));
     }
 
     /**
@@ -38,7 +38,7 @@ public class HandUtils {
      */
     public static Map<CardSuit, List<Card>> groupBySuit(List<Card> cards) {
         return cards.stream()
-                .collect(Collectors.groupingBy(Card::getSuit));
+                .collect(Collectors.groupingBy(Card::suit));
     }
 
     /**
@@ -69,8 +69,8 @@ public class HandUtils {
      */
     public static List<Card> getTopCardsByValue(List<Card> cards, Set<CardValue> excludeValues, int limit) {
         return cards.stream()
-                .filter(card -> !excludeValues.contains(card.getValue()))
-                .sorted((c1, c2) -> c2.getValue().getNumericValue() - c1.getValue().getNumericValue())
+                .filter(card -> !excludeValues.contains(card.value()))
+                .sorted((c1, c2) -> c2.value().getNumericValue() - c1.value().getNumericValue())
                 .limit(limit)
                 .collect(Collectors.toList());
     }
@@ -84,7 +84,7 @@ public class HandUtils {
      */
     public static List<Card> getCardsOfValues(List<Card> cards, Set<CardValue> values) {
         return cards.stream()
-                .filter(card -> values.contains(card.getValue()))
+                .filter(card -> values.contains(card.value()))
                 .collect(Collectors.toList());
     }
 
@@ -96,7 +96,7 @@ public class HandUtils {
      */
     public static List<Card> getStraightCards(List<Card> cards) {
         List<CardValue> distinctValues = cards.stream()
-                .map(Card::getValue)
+                .map(Card::value)
                 .distinct()
                 .sorted(Comparator.comparingInt(CardValue::getNumericValue))
                 .toList();
@@ -149,7 +149,7 @@ public class HandUtils {
      */
     public static List<Card> getSortedCards(List<Card> cards) {
         return cards.stream()
-                .sorted((c1, c2) -> c2.getValue().getNumericValue() - c1.getValue().getNumericValue())
+                .sorted((c1, c2) -> c2.value().getNumericValue() - c1.value().getNumericValue())
                 .collect(Collectors.toList());
     }
 }

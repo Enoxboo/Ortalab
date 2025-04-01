@@ -26,7 +26,7 @@ public class StraightFlushChecker implements HandChecker {
             }
 
             List<CardValue> distinctValues = sameSuitCards.stream()
-                    .map(Card::getValue)
+                    .map(Card::value)
                     .distinct()
                     .sorted(Comparator.comparingInt(CardValue::getNumericValue))
                     .toList();
@@ -39,11 +39,11 @@ public class StraightFlushChecker implements HandChecker {
                     distinctValues.contains(CardValue.ACE)) {
 
                 List<Card> straightFlushCards = sameSuitCards.stream()
-                        .filter(card -> card.getValue() == CardValue.ACE ||
-                                card.getValue() == CardValue.TWO ||
-                                card.getValue() == CardValue.THREE ||
-                                card.getValue() == CardValue.FOUR ||
-                                card.getValue() == CardValue.FIVE)
+                        .filter(card -> card.value() == CardValue.ACE ||
+                                card.value() == CardValue.TWO ||
+                                card.value() == CardValue.THREE ||
+                                card.value() == CardValue.FOUR ||
+                                card.value() == CardValue.FIVE)
                         .limit(5)
                         .toList();
 
@@ -69,7 +69,7 @@ public class StraightFlushChecker implements HandChecker {
                     }
 
                     List<Card> straightFlushCards = sameSuitCards.stream()
-                            .filter(card -> straightValues.contains(card.getValue()))
+                            .filter(card -> straightValues.contains(card.value()))
                             .limit(5)
                             .toList();
 

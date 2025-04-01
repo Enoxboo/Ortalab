@@ -27,7 +27,7 @@ public class PointsCalculator {
         Set<Card> coreCards = evaluator.getCoreCards();
 
         int cardValuePoints = coreCards.stream()
-                .mapToInt(card -> card.getValue().getNumericValue())
+                .mapToInt(card -> card.value().getNumericValue())
                 .sum();
 
         int totalPoints = basePoints + cardValuePoints;
@@ -43,8 +43,8 @@ public class PointsCalculator {
             Map<CardSuit, Integer> suitBonuses = player.getSuitDamageBonus();
             if (!suitBonuses.isEmpty()) {
                 for (Card card : coreCards) {
-                    if (suitBonuses.containsKey(card.getSuit())) {
-                        totalPoints += suitBonuses.get(card.getSuit());
+                    if (suitBonuses.containsKey(card.suit())) {
+                        totalPoints += suitBonuses.get(card.suit());
                     }
                 }
             }

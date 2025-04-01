@@ -36,7 +36,7 @@ public class CardButton extends JToggleButton {
 
     public Color determineForegroundColor() {
         return Optional.ofNullable(card)
-                .map(c -> (c.getSuit() == CardSuit.HEARTS || c.getSuit() == CardSuit.DIAMONDS)
+                .map(c -> (c.suit() == CardSuit.HEARTS || c.suit() == CardSuit.DIAMONDS)
                         ? RED_SUIT_COLOR
                         : BLACK_SUIT_COLOR)
                 .orElse(BLACK_SUIT_COLOR);

@@ -32,11 +32,11 @@ public class RoyalFlushChecker implements HandChecker {
             // Check if all royal values exist in this suit
             boolean hasAllRoyalValues = ROYAL_VALUES.stream()
                     .allMatch(value -> sameSuitCards.stream()
-                            .anyMatch(card -> card.getValue() == value));
+                            .anyMatch(card -> card.value() == value));
 
             if (hasAllRoyalValues) {
                 List<Card> royalCards = sameSuitCards.stream()
-                        .filter(card -> ROYAL_VALUES.contains(card.getValue()))
+                        .filter(card -> ROYAL_VALUES.contains(card.value()))
                         .limit(5)
                         .toList();
 

@@ -23,7 +23,7 @@ public class FullHouseChecker implements HandChecker {
         // Get the highest three of a kind
         CardValue bestThreeValue = threesValues.get(0);
         List<Card> threeCards = cards.stream()
-                .filter(card -> card.getValue() == bestThreeValue)
+                .filter(card -> card.value() == bestThreeValue)
                 .limit(3)
                 .toList();
 
@@ -31,7 +31,7 @@ public class FullHouseChecker implements HandChecker {
         if (threesValues.size() > 1) {
             CardValue secondThreeValue = threesValues.get(1);
             List<Card> pairFromThree = cards.stream()
-                    .filter(card -> card.getValue() == secondThreeValue)
+                    .filter(card -> card.value() == secondThreeValue)
                     .limit(2)
                     .toList();
 
@@ -46,7 +46,7 @@ public class FullHouseChecker implements HandChecker {
         if (!pairsValues.isEmpty()) {
             CardValue bestPairValue = pairsValues.getFirst();
             List<Card> pairCards = cards.stream()
-                    .filter(card -> card.getValue() == bestPairValue)
+                    .filter(card -> card.value() == bestPairValue)
                     .limit(2)
                     .toList();
 
