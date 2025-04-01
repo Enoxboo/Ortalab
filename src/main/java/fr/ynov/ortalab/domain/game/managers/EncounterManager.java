@@ -43,7 +43,7 @@ public class EncounterManager {
     public void completeEncounter(boolean enemyDefeated) {
         if (enemyDefeated) {
             player.addGold(calculateGoldReward());
-
+            player.applyPostBattleEffects();
             currentLevel++;
         }
     }

@@ -29,6 +29,7 @@ import java.util.List;
 public class ItemShopFrame extends JFrame {
     private static final int MAX_SHOP_ITEMS = 3;
     private static final int MAX_INVENTORY_SLOTS = 6;
+    private static final int BASE_REROLL_COST = 1;
 
     private final GameManager gameManager;
     private final Player player;
@@ -36,6 +37,8 @@ public class ItemShopFrame extends JFrame {
     private final List<ShopItemPanel> shopItemPanels = new ArrayList<>();
     private final List<CircleItemSlot> inventorySlots = new ArrayList<>();
     private JLabel goldLabel;
+    private JButton rerollButton;
+    private int rerollCount = 0;
     private final JFrame parentFrame;
 
     private ItemShopFrame(GameManager gameManager, JFrame parentFrame) {
@@ -63,31 +66,25 @@ public class ItemShopFrame extends JFrame {
     private void initializeComponents() {
         setLayout(new BorderLayout());
 
-        // Main panel with shop items
         JPanel mainPanel = new JPanel(new BorderLayout());
 
-        // Shop panel (center)
         JPanel shopPanel = createShopPanel();
         mainPanel.add(shopPanel, BorderLayout.CENTER);
 
-        // Inventory panel (right side)
         JPanel inventoryPanel = createInventoryPanel();
         mainPanel.add(inventoryPanel, BorderLayout.EAST);
 
-        // Bottom panel with gold and exit button
         JPanel bottomPanel = createBottomPanel();
 
         add(mainPanel, BorderLayout.CENTER);
         add(bottomPanel, BorderLayout.SOUTH);
 
-        // Generate random shop items using ItemShop class
         generateShopItems();
 
-        // Update inventory display
         updateInventoryDisplay();
 
-        // Update gold display
         updateGoldDisplay();
+        updateRerollButton();
     }
 
     private JPanel createShopPanel() {
@@ -96,18 +93,23 @@ public class ItemShopFrame extends JFrame {
 
         JPanel itemsPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 30, 20));
 
-        // Create shop item panels
         for (int i = 0; i < MAX_SHOP_ITEMS; i++) {
             ShopItemPanel itemPanel = new ShopItemPanel();
             itemPanel.setPreferredSize(new Dimension(200, 250));
 
-            // Add buy button action listener
             itemPanel.addBuyButtonListener(e -> handleItemPurchase(itemPanel));
 
             shopItemPanels.add(itemPanel);
             itemsPanel.add(itemPanel);
         }
 
+        // Add reroll button in a panel above the items
+        JPanel rerollPanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
+        rerollButton = new JButton("Reroll Shop (1 gold)");
+        rerollButton.addActionListener(e -> handleShopReroll());
+        rerollPanel.add(rerollButton);
+
+        shopPanel.add(rerollPanel, BorderLayout.NORTH);
         shopPanel.add(itemsPanel, BorderLayout.CENTER);
         return shopPanel;
     }
@@ -121,7 +123,6 @@ public class ItemShopFrame extends JFrame {
         JPanel slotsPanel = new JPanel(new GridLayout(3, 2, 20, 20));
         slotsPanel.setBorder(BorderFactory.createEmptyBorder(30, 20, 30, 20));
 
-        // Create inventory slots as circles
         for (int i = 0; i < MAX_INVENTORY_SLOTS; i++) {
             CircleItemSlot slot = new CircleItemSlot();
             inventorySlots.add(slot);
@@ -152,10 +153,8 @@ public class ItemShopFrame extends JFrame {
     }
 
     private void generateShopItems() {
-        // Get random items from the ItemShop class
         List<Item> randomItems = itemShop.getRandomItems(MAX_SHOP_ITEMS);
 
-        // Display the random items in the shop panels
         for (int i = 0; i < Math.min(randomItems.size(), shopItemPanels.size()); i++) {
             shopItemPanels.get(i).setItem(randomItems.get(i));
         }
@@ -168,7 +167,6 @@ public class ItemShopFrame extends JFrame {
             return;
         }
 
-        // Check if player has enough gold
         if (player.getGold() < item.getBuyValue()) {
             JOptionPane.showMessageDialog(this,
                     "Not enough gold to purchase this item!",
@@ -177,7 +175,6 @@ public class ItemShopFrame extends JFrame {
             return;
         }
 
-        // Check if inventory is full
         if (player.getInventory().size() >= MAX_INVENTORY_SLOTS) {
             JOptionPane.showMessageDialog(this,
                     "Inventory is full!",
@@ -186,36 +183,74 @@ public class ItemShopFrame extends JFrame {
             return;
         }
 
-        // Directly handle purchase - manually deduct gold and add item
         int buyValue = item.getBuyValue();
         player.addGold(-buyValue);
         player.addItem(item);
 
-        // Remove item from shop display
         itemPanel.clearItem();
 
-        // Update displays
         updateInventoryDisplay();
         updateGoldDisplay();
+        updateRerollButton();
+    }
+
+    private void handleShopReroll() {
+        int rerollCost = calculateRerollCost();
+
+        if (player.getGold() < rerollCost) {
+            JOptionPane.showMessageDialog(this,
+                    "Not enough gold to reroll the shop!",
+                    "Reroll Failed",
+                    JOptionPane.WARNING_MESSAGE);
+            return;
+        }
+
+        // Confirmation dialog
+        int response = JOptionPane.showConfirmDialog(this,
+                "Reroll the shop for " + rerollCost + " gold?",
+                "Confirm Reroll",
+                JOptionPane.YES_NO_OPTION);
+
+        if (response == JOptionPane.YES_OPTION) {
+            // Deduct gold
+            player.addGold(-rerollCost);
+
+            // Increment reroll counter
+            rerollCount++;
+
+            // Generate new items
+            generateShopItems();
+
+            // Update displays
+            updateGoldDisplay();
+            updateRerollButton();
+        }
+    }
+
+    private int calculateRerollCost() {
+        // Cost formula: rerollCount + 1
+        return BASE_REROLL_COST + rerollCount;
+    }
+
+    private void updateRerollButton() {
+        int cost = calculateRerollCost();
+        rerollButton.setText("Reroll Shop (" + cost + " gold)");
+        rerollButton.setEnabled(player.getGold() >= cost);
     }
 
     private void updateInventoryDisplay() {
         List<Item> inventory = player.getInventory();
 
-        // Reset all slots
         for (CircleItemSlot slot : inventorySlots) {
             slot.clearItem();
         }
 
-        // Fill slots with player's items
         for (int i = 0; i < inventory.size(); i++) {
             if (i < inventorySlots.size()) {
                 inventorySlots.get(i).setItem(inventory.get(i));
 
-                // Add sell action to slot (right-click)
                 final int index = i;
                 inventorySlots.get(i).setMouseListener(e -> {
-                    // Handle right-click as sell
                     if (SwingUtilities.isRightMouseButton(e)) {
                         handleItemSale(index);
                     }
@@ -239,6 +274,7 @@ public class ItemShopFrame extends JFrame {
                 player.sellItem(item);
                 updateInventoryDisplay();
                 updateGoldDisplay();
+                updateRerollButton();
             }
         }
     }

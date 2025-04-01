@@ -15,6 +15,7 @@ public class Item {
     private final Consumer<Player> removeEffect;
 
     public enum ItemRarity {
+        TEST(1.0f),
         COMMON(0.7f),
         RARE(0.3f);
 
@@ -107,7 +108,11 @@ public class Item {
 
         public Builder buyValue(int buyValue) {
             this.buyValue = buyValue;
-            this.sellValue = GameConfig.ITEM_SELL_PRICE;
+            return this;
+        }
+
+        public Builder sellValue(int sellValue) {
+            this.sellValue = sellValue;
             return this;
         }
 

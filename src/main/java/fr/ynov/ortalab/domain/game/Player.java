@@ -9,10 +9,7 @@ import main.java.fr.ynov.ortalab.domain.exceptions.DeckException;
 import main.java.fr.ynov.ortalab.domain.exceptions.PlayerActionException;
 import main.java.fr.ynov.ortalab.domain.exceptions.CardOperationException;
 
-import java.util.ArrayList;
-import java.util.EnumMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class Player {
     private int healthPoints;
@@ -23,11 +20,20 @@ public class Player {
     private final int ACTIVE_HAND_SIZE = GameConfig.ACTIVE_HAND_SIZE;
     private final int MAX_DISCARDS_PER_ENEMY = GameConfig.MAX_DISCARDS_PER_ENEMY;
 
+
     private final List<Item> inventory;
     private final List<Card> currentHand;
     private List<Card> selectedHand;
     private final Map<CardSuit, Integer> suitDamageBonus;
     private final Map<HandType, Integer> handTypeDamageBonus;
+    private Map<PointsCalculator.CardValueType, Integer> cardValueTypeBonus;
+    private final Map<Integer, Integer> cardCountBonus;
+    private int rejectionBonus;
+    private int battleEndHealingAmount;
+    private int baseDamageReduction;
+    private int lowHealthDamageReduction;
+    private int maxDiscards = GameConfig.MAX_DISCARDS_PER_ENEMY;
+
 
     public Player(int initialHP) {
         this.healthPoints = initialHP;
@@ -39,6 +45,12 @@ public class Player {
         this.selectedHand = new ArrayList<>();
         this.suitDamageBonus = new EnumMap<>(CardSuit.class);
         this.handTypeDamageBonus = new EnumMap<>(HandType.class);
+        this.cardValueTypeBonus = new HashMap<>();
+        this.cardCountBonus = new HashMap<>();
+        this.rejectionBonus = 0;
+        this.battleEndHealingAmount = 0;
+        this.baseDamageReduction = 0;
+        this.lowHealthDamageReduction = 0;
     }
 
     /**
@@ -48,7 +60,13 @@ public class Player {
      * @return Remaining health points
      */
     public int takeDamage(int damage) {
-        this.healthPoints = Math.max(0, this.healthPoints - damage);
+        int reducedDamage = Math.max(0, damage - baseDamageReduction);
+
+        if (healthPoints < maxHealthPoints / 2) {
+            reducedDamage = Math.max(0, reducedDamage - lowHealthDamageReduction);
+        }
+
+        this.healthPoints = Math.max(0, this.healthPoints - reducedDamage);
         return this.healthPoints;
     }
 
@@ -132,7 +150,7 @@ public class Player {
     }
 
     private void validateDiscardAction(List<Card> cardsToDiscard) throws PlayerActionException {
-        if (discardCount >= MAX_DISCARDS_PER_ENEMY) {
+        if (discardCount >= maxDiscards) {
             throw new PlayerActionException("Maximum discards for this enemy reached");
         }
 
@@ -157,7 +175,7 @@ public class Player {
     public void addItem(Item item) {
         if (inventory.size() < GameConfig.MAX_INVENTORY_SIZE) {
             inventory.add(item);
-            item.applyTo(this); // Use the item's built-in effect
+            item.applyTo(this);
         }
     }
 
@@ -170,6 +188,12 @@ public class Player {
         if (inventory.remove(item)) {
             gold += item.getSellValue();
             item.removeFrom(this);
+        }
+    }
+
+    public void applyPostBattleEffects() {
+        if (battleEndHealingAmount > 0) {
+            heal(battleEndHealingAmount);
         }
     }
 
@@ -195,18 +219,63 @@ public class Player {
     }
 
     public int getRemainingDiscards() {
-        return MAX_DISCARDS_PER_ENEMY - discardCount;
+        return maxDiscards - discardCount;
     }
 
     public Map<CardSuit, Integer> getSuitDamageBonus() {
-        return new EnumMap<>(suitDamageBonus);
+        return suitDamageBonus;
     }
 
     public Map<HandType, Integer> getHandTypeDamageBonus() {
-        return new EnumMap<>(handTypeDamageBonus);
+        return handTypeDamageBonus;
     }
-
     public List<Item> getInventory() {
         return new ArrayList<>(inventory);
+    }
+    public Map<PointsCalculator.CardValueType, Integer> getCardValueTypeBonus() {
+        return cardValueTypeBonus;
+    }
+    public Map<Integer, Integer> getCardCountBonus() {
+        return cardCountBonus;
+    }
+
+    public int getRejectionBonus() {
+        return rejectionBonus;
+    }
+
+    public void setRejectionBonus(int bonus) {
+        this.rejectionBonus = bonus;
+    }
+
+    public int getBattleEndHealingAmount() {
+        return battleEndHealingAmount;
+    }
+
+    public void setBattleEndHealingAmount(int amount) {
+        this.battleEndHealingAmount = Math.max(0, amount);
+    }
+
+    public int getBaseDamageReduction() {
+        return baseDamageReduction;
+    }
+
+    public void setBaseDamageReduction(int reduction) {
+        this.baseDamageReduction = Math.max(0, reduction);
+    }
+
+    public int getLowHealthDamageReduction() {
+        return lowHealthDamageReduction;
+    }
+
+    public void setLowHealthDamageReduction(int reduction) {
+        this.lowHealthDamageReduction = Math.max(0, reduction);
+    }
+
+    public int getMaxDiscards() {
+        return maxDiscards;
+    }
+
+    public void setMaxDiscards(int maxDiscards) {
+        this.maxDiscards = maxDiscards;
     }
 }
