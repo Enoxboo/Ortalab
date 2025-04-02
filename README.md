@@ -4,7 +4,6 @@
 Ortalab is a roguelike card-based game developed in Java with a graphical interface. The gameplay is inspired by poker mechanics, where players use their hands to deal damage to enemies while progressing through different encounters.
 ### Requirements
 - Java JDK 17 ou supérieur
-- Gradle 7.x ou supérieur
 
 ## Installation
 1. Clone repository
