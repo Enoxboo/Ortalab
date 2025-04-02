@@ -11,30 +11,43 @@ import main.java.fr.ynov.ortalab.domain.exceptions.CardOperationException;
 
 import java.util.*;
 
+/**
+ * Represents a player in the card-based combat game.
+ * Manages player health, inventory, card hands, and calculates damage based on poker hands.
+ */
 public class Player {
+    // Health and economy attributes
     private int healthPoints;
     private final int maxHealthPoints;
     private int gold;
+
+    // Card and hand management
     private int discardCount;
     private final int MAX_HAND_SIZE = GameConfig.MAX_HAND_SIZE;
     private final int ACTIVE_HAND_SIZE = GameConfig.ACTIVE_HAND_SIZE;
-    private final int MAX_DISCARDS_PER_ENEMY = GameConfig.MAX_DISCARDS_PER_ENEMY;
-
-
-    private final List<Item> inventory;
     private final List<Card> currentHand;
     private List<Card> selectedHand;
+    private int maxDiscards = GameConfig.MAX_DISCARDS_PER_ENEMY;
+
+    // Inventory management
+    private final List<Item> inventory;
+
+    // Combat bonuses and player stats
     private final Map<CardSuit, Integer> suitDamageBonus;
     private final Map<HandType, Integer> handTypeDamageBonus;
-    private Map<PointsCalculator.CardValueType, Integer> cardValueTypeBonus;
+    private final Map<PointsCalculator.CardValueType, Integer> cardValueTypeBonus;
     private final Map<Integer, Integer> cardCountBonus;
     private int rejectionBonus;
     private int battleEndHealingAmount;
     private int baseDamageReduction;
     private int lowHealthDamageReduction;
-    private int maxDiscards = GameConfig.MAX_DISCARDS_PER_ENEMY;
 
-
+    /**
+     * Creates a new player with specified initial health.
+     * Initializes all bonus maps and collections.
+     *
+     * @param initialHP Initial health points for the player
+     */
     public Player(int initialHP) {
         this.healthPoints = initialHP;
         this.maxHealthPoints = initialHP;
@@ -53,8 +66,11 @@ public class Player {
         this.lowHealthDamageReduction = 0;
     }
 
+    // ==================== CORE COMBAT METHODS ====================
+
     /**
-     * Take damage from an enemy attack
+     * Take damage from an enemy attack, applying any damage reduction bonuses.
+     * Low health damage reduction is applied when health is below 50%.
      *
      * @param damage Amount of damage to take
      * @return Remaining health points
@@ -71,7 +87,7 @@ public class Player {
     }
 
     /**
-     * Heal the player
+     * Heal the player without exceeding maximum health points.
      *
      * @param amount Amount of healing
      */
@@ -80,18 +96,31 @@ public class Player {
     }
 
     /**
-     * Calculate damage based on selected poker hand
+     * Calculate damage based on selected poker hand using the PointsCalculator.
      *
-     * @return Calculated damage
+     * @return Calculated damage value
      */
     public int calculateHandDamage() {
         return PointsCalculator.calculateScore(selectedHand, this);
     }
 
     /**
-     * Draw cards to fill the current hand
+     * Apply post-battle effects such as end-of-battle healing.
+     */
+    public void applyPostBattleEffects() {
+        if (battleEndHealingAmount > 0) {
+            heal(battleEndHealingAmount);
+        }
+    }
+
+    // ==================== CARD MANAGEMENT METHODS ====================
+
+    /**
+     * Draw cards to fill the current hand up to MAX_HAND_SIZE.
+     * Replenishes deck if necessary.
      *
      * @param deck The deck to draw cards from
+     * @throws DeckException If drawing from the deck fails
      */
     public void drawCards(Deck deck) throws DeckException {
         currentHand.clear();
@@ -103,7 +132,8 @@ public class Player {
     }
 
     /**
-     * Select cards for active hand
+     * Select cards to form the active hand for combat.
+     * Limited to ACTIVE_HAND_SIZE (typically 5) cards.
      *
      * @param selectedCards Cards chosen to form the active hand
      * @throws IllegalArgumentException if more than 5 cards are selected
@@ -116,11 +146,13 @@ public class Player {
     }
 
     /**
-     * Discard selected cards and draw replacements
+     * Discard selected cards and draw replacements from the deck.
+     * Limited by the maximum discard count per enemy.
      *
      * @param cardsToDiscard Cards to be discarded
      * @param deck Deck to draw new cards from
-     * @throws IllegalStateException if discard limit is reached
+     * @throws PlayerActionException If discard action is invalid
+     * @throws CardOperationException If card operations fail
      */
     public void discard(List<Card> cardsToDiscard, Deck deck) throws PlayerActionException, CardOperationException {
         validateDiscardAction(cardsToDiscard);
@@ -149,6 +181,13 @@ public class Player {
         }
     }
 
+    /**
+     * Validate that a discard action can be performed with the given cards.
+     * Checks discard count limit and card selection validity.
+     *
+     * @param cardsToDiscard Cards selected for discard
+     * @throws PlayerActionException If the discard action is invalid
+     */
     private void validateDiscardAction(List<Card> cardsToDiscard) throws PlayerActionException {
         if (discardCount >= maxDiscards) {
             throw new PlayerActionException("Maximum discards for this enemy reached");
@@ -163,12 +202,18 @@ public class Player {
         }
     }
 
+    /**
+     * Reset the discard counter, typically called at the start of a new battle.
+     */
     public void resetDiscards() {
         this.discardCount = 0;
     }
 
+    // ==================== INVENTORY MANAGEMENT METHODS ====================
+
     /**
-     * Add an item to the player's inventory
+     * Add an item to the player's inventory and apply its effects.
+     * Limited by the maximum inventory size.
      *
      * @param item Item to add
      */
@@ -180,7 +225,7 @@ public class Player {
     }
 
     /**
-     * Sell an item from inventory
+     * Sell an item from inventory, removing its effects and gaining gold.
      *
      * @param item Item to sell
      */
@@ -191,17 +236,17 @@ public class Player {
         }
     }
 
-    public void applyPostBattleEffects() {
-        if (battleEndHealingAmount > 0) {
-            heal(battleEndHealingAmount);
-        }
-    }
-
+    /**
+     * Add gold to the player's wallet.
+     *
+     * @param amount Amount of gold to add
+     */
     public void addGold(int amount) {
         this.gold += amount;
     }
 
-    // Getters and Setters
+    // ==================== GETTERS AND SETTERS ====================
+
     public int getHealthPoints() {
         return healthPoints;
     }
@@ -214,6 +259,9 @@ public class Player {
         return gold;
     }
 
+    /**
+     * @return A defensive copy of the current hand
+     */
     public List<Card> getCurrentHand() {
         return new ArrayList<>(currentHand);
     }
@@ -229,12 +277,18 @@ public class Player {
     public Map<HandType, Integer> getHandTypeDamageBonus() {
         return handTypeDamageBonus;
     }
+
+    /**
+     * @return A defensive copy of the inventory
+     */
     public List<Item> getInventory() {
         return new ArrayList<>(inventory);
     }
+
     public Map<PointsCalculator.CardValueType, Integer> getCardValueTypeBonus() {
         return cardValueTypeBonus;
     }
+
     public Map<Integer, Integer> getCardCountBonus() {
         return cardCountBonus;
     }

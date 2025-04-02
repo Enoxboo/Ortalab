@@ -9,12 +9,19 @@ import main.java.fr.ynov.ortalab.domain.game.managers.GameManager.GameState;
 
 import java.util.List;
 
+/**
+ * Manages the turn sequence between the player and enemies.
+ * Handles damage calculation, state transitions, and game progression.
+ */
 public class TurnManager {
     private final Player player;
     private final EncounterManager encounterManager;
-    private GameState currentGameState;
     private final Deck gameDeck;
+    private GameState currentGameState;
 
+    /**
+     * Creates a new turn manager with the specified components.
+     */
     public TurnManager(Player player, EncounterManager encounterManager, Deck gameDeck) {
         this.player = player;
         this.encounterManager = encounterManager;
@@ -22,57 +29,69 @@ public class TurnManager {
         this.currentGameState = GameState.INITIALIZING;
     }
 
+    /**
+     * Processes the player's turn with the selected cards.
+     * Handles damage calculation, enemy health reduction, and state transitions.
+     *
+     * @param selectedCards cards the player chose to play this turn
+     * @throws DeckException if there's an issue with deck operations
+     */
     public void processPlayerTurn(List<Card> selectedCards) throws DeckException {
         player.selectHand(selectedCards);
         int playerDamage = player.calculateHandDamage();
 
         Enemy currentEnemy = encounterManager.getCurrentEnemy();
-
         int remainingEnemyHP = currentEnemy.takeDamage(playerDamage, selectedCards);
 
         discardUsedCards(selectedCards);
 
-        // If enemy HP is 0 or less, handle enemy defeat
+        // Handle the outcome of the player's attack
         if (remainingEnemyHP <= 0) {
             handleEnemyDefeated();
-            return;
+        } else {
+            processEnemyTurn(currentEnemy);
         }
-
-        // If enemy is still alive, process enemy turn
-        processEnemyTurn(currentEnemy);
     }
 
-    private void handleEnemyDefeated() throws DeckException {
-        // Check if we should visit the shop after this encounter
-        boolean shouldVisitShop = encounterManager.shouldVisitShop();
+    /**
+     * Returns the current game state.
+     */
+    public GameState getCurrentGameState() {
+        return currentGameState;
+    }
 
-        // Complete the encounter, which updates the level
+    /**
+     * Handles what happens when an enemy is defeated.
+     * Manages shop visits, level progression, and game completion.
+     *
+     * @throws DeckException if there's an issue with deck operations
+     */
+    private void handleEnemyDefeated() throws DeckException {
+        boolean shouldVisitShop = encounterManager.shouldVisitShop();
         encounterManager.completeEncounter(true);
 
-        // Check if the game is complete
         if (encounterManager.isGameComplete()) {
             currentGameState = GameState.VICTORY;
             return;
         }
 
-        // If we should visit the shop after this encounter
         if (shouldVisitShop) {
             currentGameState = GameState.SHOP_VISIT;
             return;
         }
 
-        // Otherwise start the next encounter
+        // Start next encounter
         encounterManager.startEncounter();
         player.resetDiscards();
         currentGameState = GameState.SELECTING_HAND;
     }
 
-    private void discardUsedCards(List<Card> usedCards) {
-        for (Card card : usedCards) {
-            gameDeck.returnCard(card);
-        }
-    }
-
+    /**
+     * Processes the enemy's turn including attacks and cooldown reduction.
+     * Updates game state based on battle outcome.
+     *
+     * @param currentEnemy the enemy taking its turn
+     */
     private void processEnemyTurn(Enemy currentEnemy) {
         currentEnemy.reduceCooldown();
 
@@ -91,7 +110,12 @@ public class TurnManager {
         }
     }
 
-    public GameState getCurrentGameState() {
-        return currentGameState;
+    /**
+     * Returns used cards to the deck.
+     */
+    private void discardUsedCards(List<Card> usedCards) {
+        for (Card card : usedCards) {
+            gameDeck.returnCard(card);
+        }
     }
 }

@@ -8,6 +8,10 @@ import main.java.fr.ynov.ortalab.domain.utils.HandUtils;
 import java.util.List;
 import java.util.Set;
 
+/**
+ * Checks for a Full House hand (three cards of one value, two cards of another value).
+ * Handles multiple three-of-a-kinds by taking the highest valued one.
+ */
 public class FullHouseChecker implements HandChecker {
 
     @Override
@@ -15,7 +19,7 @@ public class FullHouseChecker implements HandChecker {
         List<CardValue> threesValues = HandUtils.findValueGroups(cards, 3);
         List<CardValue> pairsValues = HandUtils.findValueGroups(cards, 2);
 
-        // Case 1: At least one three of a kind
+        // Must have at least one three of a kind
         if (threesValues.isEmpty()) {
             return false;
         }
@@ -27,7 +31,7 @@ public class FullHouseChecker implements HandChecker {
                 .limit(3)
                 .toList();
 
-        // Case 2: Multiple three of a kinds (for potential items)
+        // Case: Multiple three of a kinds (use highest as trips, second highest as pair)
         if (threesValues.size() > 1) {
             CardValue secondThreeValue = threesValues.get(1);
             List<Card> pairFromThree = cards.stream()
@@ -42,7 +46,7 @@ public class FullHouseChecker implements HandChecker {
             return true;
         }
 
-        // Case 3: Three of a kind + at least one pair
+        // Case: One three of a kind + at least one pair
         if (!pairsValues.isEmpty()) {
             CardValue bestPairValue = pairsValues.getFirst();
             List<Card> pairCards = cards.stream()

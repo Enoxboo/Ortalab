@@ -12,16 +12,25 @@ import java.util.List;
 import java.util.Set;
 import java.util.Map;
 
+/**
+ * Checks for a Royal Flush hand (Ten through Ace of the same suit).
+ * This is the highest possible hand in poker.
+ */
 public class RoyalFlushChecker implements HandChecker {
 
+    /**
+     * The specific card values required for a Royal Flush (10-A).
+     */
     private static final Set<CardValue> ROYAL_VALUES = new HashSet<>(Arrays.asList(
             CardValue.TEN, CardValue.JACK, CardValue.QUEEN, CardValue.KING, CardValue.ACE
     ));
 
     @Override
     public boolean checkHand(List<Card> cards, Set<Card> usedCards, Set<Card> coreCards) {
+        // Group cards by suit
         Map<CardSuit, List<Card>> suitGroups = HandUtils.groupBySuit(cards);
 
+        // Check each suit group for a royal flush
         for (Map.Entry<CardSuit, List<Card>> entry : suitGroups.entrySet()) {
             if (entry.getValue().size() < 5) {
                 continue;

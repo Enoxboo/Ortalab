@@ -9,6 +9,10 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+/**
+ * Checks for a Three of a Kind hand (three cards of the same value).
+ * Also selects the two highest remaining cards as kickers.
+ */
 public class ThreeOfAKindChecker implements HandChecker {
 
     @Override
@@ -19,6 +23,7 @@ public class ThreeOfAKindChecker implements HandChecker {
             return false;
         }
 
+        // Get the highest three of a kind
         CardValue tripValue = threeOfAKindValues.getFirst();
         List<Card> tripCards = cards.stream()
                 .filter(card -> card.value() == tripValue)
@@ -28,7 +33,7 @@ public class ThreeOfAKindChecker implements HandChecker {
         usedCards.addAll(tripCards);
         coreCards.addAll(tripCards);
 
-        // Find two highest kickers
+        // Find two highest kickers to complete the 5-card hand
         Set<CardValue> excludeValues = new HashSet<>();
         excludeValues.add(tripValue);
         List<Card> kickers = HandUtils.getTopCardsByValue(cards, excludeValues, 2);

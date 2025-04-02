@@ -9,6 +9,10 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+/**
+ * Checks for a Two Pair hand (two cards of one value, two cards of another value).
+ * Also selects the highest remaining card as a kicker.
+ */
 public class TwoPairsChecker implements HandChecker {
 
     @Override
@@ -39,7 +43,7 @@ public class TwoPairsChecker implements HandChecker {
         coreCards.addAll(firstPairCards);
         coreCards.addAll(secondPairCards);
 
-        // Find highest kicker
+        // Find the highest kicker to complete the 5-card hand
         Set<CardValue> excludeValues = new HashSet<>();
         excludeValues.add(firstPairValue);
         excludeValues.add(secondPairValue);

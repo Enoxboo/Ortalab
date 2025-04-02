@@ -12,6 +12,10 @@ import java.util.Set;
 import java.util.Map;
 import java.util.Comparator;
 
+/**
+ * Checks for a Straight Flush hand (five consecutive cards of the same suit).
+ * This is the second-highest hand in poker.
+ */
 public class StraightFlushChecker implements HandChecker {
 
     @Override
@@ -21,6 +25,7 @@ public class StraightFlushChecker implements HandChecker {
         for (Map.Entry<CardSuit, List<Card>> entry : suitGroups.entrySet()) {
             List<Card> sameSuitCards = entry.getValue();
 
+            // Need at least 5 cards of the same suit
             if (sameSuitCards.size() < 5) {
                 continue;
             }
@@ -31,7 +36,7 @@ public class StraightFlushChecker implements HandChecker {
                     .sorted(Comparator.comparingInt(CardValue::getNumericValue))
                     .toList();
 
-            // Check for wheel straight flush (A-5)
+            // Special case: Check for wheel straight flush (A-5)
             if (distinctValues.contains(CardValue.TWO) &&
                     distinctValues.contains(CardValue.THREE) &&
                     distinctValues.contains(CardValue.FOUR) &&
@@ -55,6 +60,7 @@ public class StraightFlushChecker implements HandChecker {
             // Check for regular straight flush
             for (int i = 0; i <= distinctValues.size() - 5; i++) {
                 boolean isStraight = true;
+                // Check for consecutive values
                 for (int j = i; j < i + 4; j++) {
                     if (distinctValues.get(j).getNumericValue() + 1 != distinctValues.get(j + 1).getNumericValue()) {
                         isStraight = false;

@@ -9,6 +9,10 @@ import java.util.List;
 import java.util.Set;
 import java.util.HashSet;
 
+/**
+ * Checks for a "Pair" hand (two cards of the same value).
+ * Also selects the three highest remaining cards as kickers.
+ */
 public class PairChecker implements HandChecker {
 
     @Override
@@ -29,7 +33,7 @@ public class PairChecker implements HandChecker {
         usedCards.addAll(pairCards);
         coreCards.addAll(pairCards);
 
-        // Find three highest kickers
+        // Find three highest kickers to complete the 5-card hand
         Set<CardValue> excludeValues = new HashSet<>();
         excludeValues.add(pairValue);
         List<Card> kickers = HandUtils.getTopCardsByValue(cards, excludeValues, 3);

@@ -17,11 +17,20 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
+/**
+ * A visual representation of a card deck that displays all cards in a grid layout.
+ * Cards that have been used by the deck are visually differentiated.
+ */
 public class DeckViewFrame extends JFrame {
     private final Deck deck;
     private final List<CardButton> cardButtons;
     private final JPanel deckPanel;
 
+    /**
+     * Creates a new deck view frame for the specified deck.
+     *
+     * @param deck The deck to be visualized
+     */
     public DeckViewFrame(Deck deck) {
         this.deck = deck;
         this.cardButtons = new ArrayList<>();
@@ -31,6 +40,7 @@ public class DeckViewFrame extends JFrame {
         setLocationRelativeTo(null);
         setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 
+        // Create a grid layout with spaces between cards (4 suits × 13 values)
         deckPanel = new JPanel(new GridLayout(4, 13, 5, 5));
         deckPanel.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
 
@@ -38,8 +48,10 @@ public class DeckViewFrame extends JFrame {
         add(new JScrollPane(deckPanel));
     }
 
+    /**
+     * Creates card buttons for all possible cards and adds them to the panel.
+     */
     private void createDeckView() {
-        // Create buttons for each card
         for (CardSuit suit : CardSuit.values()) {
             for (CardValue value : CardValue.values()) {
                 Card card = new Card(value, suit);
@@ -50,35 +62,43 @@ public class DeckViewFrame extends JFrame {
         }
     }
 
+    /**
+     * Creates a custom CardButton with specific appearance settings.
+     *
+     * @param card The card to create a button for
+     * @return A configured CardButton instance
+     */
     private CardButton createCardButton(Card card) {
         return new CardButton(card) {
             @Override
             protected void setupButtonAppearance() {
                 super.setupButtonAppearance();
-                // Make cards smaller
+                // Make cards smaller for better fit in the grid
                 setPreferredSize(new Dimension(80, 120));
-                // Disable interactions
+                // Disable interactions as this is view-only
                 setEnabled(false);
             }
         };
     }
 
+    /**
+     * Updates the visual state of all cards to reflect the current deck state.
+     * Used cards are grayed out while available cards remain white.
+     */
     public void updateDeckView() {
-        // Get the set of used cards from the deck
         Set<Card> usedCards = deck.getUsedCards();
 
-        // Update each card button's appearance
         for (CardButton button : cardButtons) {
             Card card = button.getCard();
 
-            // Grey out used cards
+            // Apply visual distinction between used and available cards
             if (usedCards.contains(card)) {
                 button.setBackground(Color.LIGHT_GRAY);
             } else {
                 button.setBackground(Color.WHITE);
             }
 
-            // Ensure text color is reset
+            // Ensure proper text color is maintained
             button.setForeground(button.determineForegroundColor());
         }
     }

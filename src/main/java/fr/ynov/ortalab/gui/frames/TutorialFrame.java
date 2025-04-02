@@ -13,7 +13,25 @@ import java.awt.Dimension;
 import java.awt.Component;
 import java.awt.Font;
 
+/**
+ * A frame displaying the game tutorial with basic gameplay instructions.
+ * Provides new players with information about game mechanics and objectives.
+ */
 public class TutorialFrame extends JFrame {
+
+    /**
+     * Factory method to create and display the tutorial frame.
+     */
+    public static void showTutorial() {
+        SwingUtilities.invokeLater(() -> {
+            TutorialFrame tutorialFrame = new TutorialFrame();
+            tutorialFrame.setVisible(true);
+        });
+    }
+
+    /**
+     * Constructs a new tutorial frame with game instructions.
+     */
     public TutorialFrame() {
         // Set up the frame
         setTitle("Ortalab - Tutorial");
@@ -26,14 +44,15 @@ public class TutorialFrame extends JFrame {
         tutorialPanel.setLayout(new BoxLayout(tutorialPanel, BoxLayout.Y_AXIS));
         tutorialPanel.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
 
-        // Tutorial text areas
+        // Tutorial title
         JTextArea titleArea = new JTextArea("Ortalab");
         titleArea.setFont(new Font("Arial", Font.BOLD, 20));
         titleArea.setEditable(false);
         titleArea.setMaximumSize(new Dimension(Integer.MAX_VALUE, 50));
         titleArea.setAlignmentX(Component.CENTER_ALIGNMENT);
 
-        final JTextArea tutorialTextArea = getJTextArea();
+        // Tutorial content
+        final JTextArea tutorialTextArea = createTutorialTextArea();
 
         // Add components to panel
         tutorialPanel.add(titleArea);
@@ -52,7 +71,12 @@ public class TutorialFrame extends JFrame {
         add(tutorialPanel);
     }
 
-    private static JTextArea getJTextArea() {
+    /**
+     * Creates the text area containing the tutorial content.
+     *
+     * @return A configured JTextArea with tutorial text
+     */
+    private static JTextArea createTutorialTextArea() {
         JTextArea tutorialTextArea = new JTextArea(
                 """
                          Welcome to Ortalab, a card-based combat game!
@@ -92,12 +116,5 @@ public class TutorialFrame extends JFrame {
         tutorialTextArea.setLineWrap(true);
         tutorialTextArea.setWrapStyleWord(true);
         return tutorialTextArea;
-    }
-
-    public static void showTutorial() {
-        SwingUtilities.invokeLater(() -> {
-            TutorialFrame tutorialFrame = new TutorialFrame();
-            tutorialFrame.setVisible(true);
-        });
     }
 }

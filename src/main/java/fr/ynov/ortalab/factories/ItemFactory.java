@@ -13,6 +13,11 @@ import java.util.Map;
 import java.util.Random;
 import java.util.function.Supplier;
 
+/**
+ * Factory responsible for creating, managing, and providing game items.
+ * Implements a registry pattern for items and handles random item generation
+ * based on rarity tiers.
+ */
 public class ItemFactory {
     private static final Map<String, Supplier<Item>> itemRegistry = new HashMap<>();
     private static final List<String> commonItems = new ArrayList<>();
@@ -20,13 +25,98 @@ public class ItemFactory {
     private static final List<String> testItems = new ArrayList<>();
     private static final Random random = new Random();
 
+    // Initialize items on class load
     static {
         registerItems();
         categorizeItemsByRarity();
     }
 
+    /**
+     * Retrieves an item by its name from the registry.
+     *
+     * @param itemName The name of the item to retrieve
+     * @return A new instance of the requested item
+     * @throws IllegalArgumentException if no item with the given name exists
+     */
+    public static Item getItem(String itemName) {
+        Supplier<Item> itemSupplier = itemRegistry.get(itemName);
+        if (itemSupplier == null) {
+            throw new IllegalArgumentException("No item registered with name: " + itemName);
+        }
+        return itemSupplier.get();
+    }
+
+    /**
+     * Generates a list of random items based on configured rarity drop rates.
+     * Test items always have 100% chance to be included.
+     *
+     * @param count The number of items to generate
+     * @return A list of randomly selected items
+     */
+    public static List<Item> getRandomItems(int count) {
+        List<Item> selectedItems = new ArrayList<>();
+
+        // First, add all TEST items (100% chance)
+        if (!testItems.isEmpty()) {
+            for (String itemName : testItems) {
+                selectedItems.add(getItem(itemName));
+                if (selectedItems.size() >= count) {
+                    return selectedItems;
+                }
+            }
+        }
+
+        // Fill remaining slots with random items based on rarity chance
+        int remainingSlots = count - selectedItems.size();
+        for (int i = 0; i < remainingSlots; i++) {
+            float roll = random.nextFloat();
+            String itemName;
+
+            if (roll < Item.ItemRarity.RARE.getDropRate() && !rareItems.isEmpty()) {
+                itemName = rareItems.get(random.nextInt(rareItems.size()));
+            } else {
+                itemName = commonItems.get(random.nextInt(commonItems.size()));
+            }
+
+            selectedItems.add(getItem(itemName));
+        }
+
+        return selectedItems;
+    }
+
+    /**
+     * Helper method to register an item in the item registry.
+     */
+    private static void registerItem(String itemName, Supplier<Item> itemSupplier) {
+        itemRegistry.put(itemName, itemSupplier);
+    }
+
+    /**
+     * Categorizes all registered items into their respective rarity lists.
+     */
+    private static void categorizeItemsByRarity() {
+        for (String itemName : itemRegistry.keySet()) {
+            Item item = getItem(itemName);
+            switch (item.getRarity()) {
+                case COMMON:
+                    commonItems.add(itemName);
+                    break;
+                case RARE:
+                    rareItems.add(itemName);
+                    break;
+                case TEST:
+                    testItems.add(itemName);
+                    break;
+            }
+        }
+    }
+
+    /**
+     * Registers all game items with their effects, values, and descriptions.
+     * Items are grouped by their effect types for better organization.
+     */
     private static void registerItems() {
-        // Suit damage items
+        // === SUIT DAMAGE BONUS ITEMS ===
         registerItem("The Moon", () -> new Item.Builder("The Moon")
                 .description("Increases damage of Clubs cards by 15")
                 .rarity(Item.ItemRarity.COMMON)
@@ -38,7 +128,7 @@ public class ItemFactory {
                                 player.getSuitDamageBonus().getOrDefault(CardSuit.CLUBS, 0) + getItem("The Moon").getValue()),
                         player -> {
                             Map<CardSuit, Integer> bonuses = player.getSuitDamageBonus();
-                            bonuses.put(CardSuit.CLUBS, bonuses.getOrDefault(CardSuit.CLUBS, 0) - getItem("Alignment").getValue());
+                            bonuses.put(CardSuit.CLUBS, bonuses.getOrDefault(CardSuit.CLUBS, 0) - getItem("The Moon").getValue());
                             if (bonuses.get(CardSuit.CLUBS) <= 0) bonuses.remove(CardSuit.CLUBS);
                         }
                 )
@@ -61,6 +151,7 @@ public class ItemFactory {
                 )
                 .build());
 
+        // === HAND TYPE BONUS ITEMS - COMMON TIER ===
         registerItem("Isolation", () -> new Item.Builder("Isolation")
                 .description("High Card Attacks deal +40 damage.")
                 .rarity(Item.ItemRarity.COMMON)
@@ -163,6 +254,7 @@ public class ItemFactory {
                 )
                 .build());
 
+        // === SPECIAL BONUS ITEMS - COMMON TIER ===
         registerItem("The Commander", () -> new Item.Builder("The Commander")
                 .description("Each Attacking honor card deals +30 damage.")
                 .rarity(Item.ItemRarity.COMMON)
@@ -180,6 +272,7 @@ public class ItemFactory {
                 )
                 .build());
 
+        // === HAND TYPE BONUS ITEMS - RARE TIER ===
         registerItem("Isolation+", () -> new Item.Builder("Isolation+")
                 .description("High Card Attacks deal +100 damage.")
                 .rarity(Item.ItemRarity.RARE)
@@ -282,6 +375,7 @@ public class ItemFactory {
                 )
                 .build());
 
+        // === SPECIAL BONUS ITEMS - RARE TIER ===
         registerItem("The Swarm", () -> new Item.Builder("The Swarm")
                 .description("If an Attack contains three or more cards, it deals +125 damage.")
                 .rarity(Item.ItemRarity.RARE)
@@ -328,6 +422,7 @@ public class ItemFactory {
                 )
                 .build());
 
+        // === DEFENSIVE AND UTILITY ITEMS ===
         registerItem("Mediation", () -> new Item.Builder("Mediation")
                 .description("Restore 10 Health after a battle ends.")
                 .rarity(Item.ItemRarity.COMMON)
@@ -387,65 +482,5 @@ public class ItemFactory {
                         player -> player.setMaxDiscards(player.getMaxDiscards() - getItem("Refusal+").getValue())
                 )
                 .build());
-    }
-
-    private static void registerItem(String itemName, Supplier<Item> itemSupplier) {
-        itemRegistry.put(itemName, itemSupplier);
-    }
-
-    private static void categorizeItemsByRarity() {
-        for (String itemName : itemRegistry.keySet()) {
-            Item item = getItem(itemName);
-            switch (item.getRarity()) {
-                case COMMON:
-                    commonItems.add(itemName);
-                    break;
-                case RARE:
-                    rareItems.add(itemName);
-                    break;
-                case TEST:
-                    testItems.add(itemName);
-                    break;
-            }
-        }
-    }
-
-    public static Item getItem(String itemName) {
-        Supplier<Item> itemSupplier = itemRegistry.get(itemName);
-        if (itemSupplier == null) {
-            throw new IllegalArgumentException("No item registered with name: " + itemName);
-        }
-        return itemSupplier.get();
-    }
-
-    public static List<Item> getRandomItems(int count) {
-        List<Item> selectedItems = new ArrayList<>();
-
-        // First, add all TEST items (100% chance)
-        if (!testItems.isEmpty()) {
-            for (String itemName : testItems) {
-                selectedItems.add(getItem(itemName));
-                if (selectedItems.size() >= count) {
-                    return selectedItems;
-                }
-            }
-        }
-
-        // Fill remaining slots with random items
-        int remainingSlots = count - selectedItems.size();
-        for (int i = 0; i < remainingSlots; i++) {
-            float roll = random.nextFloat();
-            String itemName;
-
-            if (roll < Item.ItemRarity.RARE.getDropRate() && !rareItems.isEmpty()) {
-                itemName = rareItems.get(random.nextInt(rareItems.size()));
-            } else {
-                itemName = commonItems.get(random.nextInt(commonItems.size()));
-            }
-
-            selectedItems.add(getItem(itemName));
-        }
-
-        return selectedItems;
     }
 }

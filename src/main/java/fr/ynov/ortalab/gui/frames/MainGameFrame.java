@@ -23,8 +23,14 @@ import java.awt.BorderLayout;
 import java.awt.GridLayout;
 import java.awt.FlowLayout;
 
+/**
+ * The main game interface showing player and enemy status, player's hand,
+ * and game controls. This frame serves as the central hub for gameplay.
+ */
 public class MainGameFrame extends JFrame {
     private final GameManager gameManager;
+
+    // UI Components
     private HandPanel handPanel;
     private ButtonPanel buttonPanel;
     private StatusPanel playerStatusPanel;
@@ -35,6 +41,12 @@ public class MainGameFrame extends JFrame {
     // Timer to check game state periodically
     private Timer gameStateTimer;
 
+    /**
+     * Constructs the main game frame with all necessary components.
+     *
+     * @param gameManager The game manager handling game logic
+     * @throws DeckException If there's an issue initializing the player's deck
+     */
     public MainGameFrame(GameManager gameManager) throws DeckException {
         this.gameManager = gameManager;
 
@@ -47,17 +59,13 @@ public class MainGameFrame extends JFrame {
         setMinimumSize(new Dimension(frameWidth, frameHeight));
         setMaximumSize(new Dimension(frameWidth, frameHeight));
         setPreferredSize(new Dimension(frameWidth, frameHeight));
-
-        // Prevent resizing
         setResizable(false);
 
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLayout(new BorderLayout());
-
-        // Center the frame on the screen
         setLocationRelativeTo(null);
 
-        // Initialize game components
+        // Initialize game components and layout
         initializeGameComponents();
 
         // Create main content panel
@@ -78,25 +86,31 @@ public class MainGameFrame extends JFrame {
         createGameStateTimer();
     }
 
-    private void createGameStateTimer() {
-        gameStateTimer = new Timer(100, e -> {
-            if (gameManager.getGameState() == GameState.SHOP_VISIT) {
-                // If we need to visit the shop, stop the timer, show the shop, and hide this frame
-                gameStateTimer.stop();
-                showShop();
+    /**
+     * Factory method to create and show the main game frame.
+     *
+     * @param gameManager The game manager handling game logic
+     */
+    public static void launch(GameManager gameManager) {
+        SwingUtilities.invokeLater(() -> {
+            MainGameFrame frame;
+            try {
+                frame = new MainGameFrame(gameManager);
+            } catch (DeckException e) {
+                throw new RuntimeException(e);
             }
+            frame.setVisible(true);
         });
-        gameStateTimer.start();
     }
 
-    private void showShop() {
-        // Hide the game frame while showing the shop
-        setVisible(false);
+    //-------------------- Initialization Methods --------------------//
 
-        // Show the item shop
-        ItemShopFrame.displayShopMidGame(gameManager, this);
-    }
-
+    /**
+     * Initializes all game components including status panels,
+     * hand panel, and game controls.
+     *
+     * @throws DeckException If there's an issue with the player's deck
+     */
     private void initializeGameComponents() throws DeckException {
         Player player = gameManager.getPlayer();
         Enemy enemy = gameManager.getCurrentEnemy();
@@ -123,18 +137,18 @@ public class MainGameFrame extends JFrame {
                 enemyStatusPanel,
                 currentHandPointsLabel
         );
+
+        // Add tutorial button
         JButton tutorialButton = createTutorialButton();
         sortButtonPanel.add(Box.createVerticalStrut(10));
         sortButtonPanel.add(tutorialButton);
     }
 
-    private JButton createTutorialButton() {
-        JButton tutorialButton = new JButton("Tutorial");
-        tutorialButton.setAlignmentX(Component.CENTER_ALIGNMENT);
-        tutorialButton.addActionListener(e -> TutorialFrame.showTutorial());
-        return tutorialButton;
-    }
-
+    /**
+     * Creates the status panel containing player and enemy information.
+     *
+     * @return A JPanel containing player and enemy status
+     */
     private JPanel createStatusPanel() {
         // Create a panel to split status panels
         JPanel statusContainer = new JPanel(new GridLayout(1, 2, 10, 0));
@@ -148,6 +162,11 @@ public class MainGameFrame extends JFrame {
         return statusContainer;
     }
 
+    /**
+     * Creates the bottom panel containing the player's hand and action buttons.
+     *
+     * @return A JPanel for the bottom section of the game
+     */
     private JPanel createBottomPanel() {
         // Create bottom panel to contain game elements
         JPanel bottomPanel = new JPanel(new BorderLayout());
@@ -177,18 +196,50 @@ public class MainGameFrame extends JFrame {
         return bottomPanel;
     }
 
-    public static void launch(GameManager gameManager) {
-        SwingUtilities.invokeLater(() -> {
-            MainGameFrame frame;
-            try {
-                frame = new MainGameFrame(gameManager);
-            } catch (DeckException e) {
-                throw new RuntimeException(e);
-            }
-            frame.setVisible(true);
-        });
+    /**
+     * Creates a tutorial button that opens the tutorial frame.
+     *
+     * @return A JButton that launches the tutorial
+     */
+    private JButton createTutorialButton() {
+        JButton tutorialButton = new JButton("Tutorial");
+        tutorialButton.setAlignmentX(Component.CENTER_ALIGNMENT);
+        tutorialButton.addActionListener(e -> TutorialFrame.showTutorial());
+        return tutorialButton;
     }
 
+    /**
+     * Creates a timer to periodically check the game state
+     * and respond to state changes (e.g., shop visits).
+     */
+    private void createGameStateTimer() {
+        gameStateTimer = new Timer(100, e -> {
+            if (gameManager.getGameState() == GameState.SHOP_VISIT) {
+                // If we need to visit the shop, stop the timer, show the shop, and hide this frame
+                gameStateTimer.stop();
+                showShop();
+            }
+        });
+        gameStateTimer.start();
+    }
+
+    //-------------------- State Management Methods --------------------//
+
+    /**
+     * Shows the item shop and hides the main game frame temporarily.
+     */
+    private void showShop() {
+        // Hide the game frame while showing the shop
+        setVisible(false);
+
+        // Show the item shop
+        ItemShopFrame.displayShopMidGame(gameManager, this);
+    }
+
+    /**
+     * Refreshes the game display after returning from the shop
+     * or when game state changes.
+     */
     public void refreshGameDisplay() {
         Player player = gameManager.getPlayer();
         Enemy enemy = gameManager.getCurrentEnemy();
@@ -198,7 +249,10 @@ public class MainGameFrame extends JFrame {
         enemyStatusPanel.updateStatus(player, enemy, currentLevel);
         handPanel.sortHand(handPanel.getCurrentSortType());
     }
-    // Clean up resources when closing
+
+    /**
+     * Cleans up resources when the frame is disposed.
+     */
     @Override
     public void dispose() {
         if (gameStateTimer != null) {

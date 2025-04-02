@@ -19,21 +19,34 @@ import java.awt.BasicStroke;
 import java.awt.Component;
 import java.awt.event.ActionListener;
 
+/**
+ * A panel that displays a shop item with its details and purchase button.
+ * Used in the game's shop interface to present buyable items to the player.
+ */
 public class ShopItemPanel extends JPanel {
-    private Item item;
+    // UI Constants
+    private final int CIRCLE_SIZE = 60;
+    private final Color CIRCLE_COLOR = Color.WHITE;
+
+    // UI Components
+    private final JPanel circlePanel;
     private final JLabel nameLabel;
     private final JLabel effectLabel;
     private final JLabel costLabel;
     private final JButton buyButton;
-    private final JPanel circlePanel;
-    private final int CIRCLE_SIZE = 60;
-    private final Color CIRCLE_COLOR = Color.WHITE;
 
+    // Data
+    private Item item;
+
+    /**
+     * Creates a new ShopItemPanel with default layout and components.
+     * The panel displays a circle representation of the item and its details.
+     */
     public ShopItemPanel() {
         setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
         setBorder(BorderFactory.createLineBorder(Color.LIGHT_GRAY, 1, true));
 
-        // Circle panel at the top
+        // Circle panel at the top to visually represent the item
         circlePanel = new JPanel() {
             @Override
             protected void paintComponent(Graphics g) {
@@ -78,8 +91,9 @@ public class ShopItemPanel extends JPanel {
         buyButton = new JButton("Purchase");
         buyButton.setAlignmentX(Component.CENTER_ALIGNMENT);
         buyButton.setFocusPainted(false);
+        buyButton.setEnabled(false);  // Initially disabled until item is set
 
-        // Add components to panel
+        // Assemble components with spacing
         add(Box.createVerticalStrut(10));
         add(circlePanel);
         add(Box.createVerticalStrut(10));
@@ -91,22 +105,19 @@ public class ShopItemPanel extends JPanel {
         add(Box.createVerticalStrut(15));
         add(buyButton);
         add(Box.createVerticalStrut(10));
-
-        // Initially disable the button
-        buyButton.setEnabled(false);
     }
 
+    /**
+     * Sets the item displayed in this panel and updates all UI components.
+     *
+     * @param item The item to display, or null to clear the panel
+     */
     public void setItem(Item item) {
         this.item = item;
 
         if (item != null) {
             nameLabel.setText(item.getName());
-
-            // Format effect description based on item type
-            String effectType = item.getDescription();
-            String effectValue = "+" + item.getValue();
             effectLabel.setText("<html><div style='text-align:center;'>" + item.getDescription());
-
             costLabel.setText("Cost: " + item.getBuyValue() + " gold");
             buyButton.setEnabled(true);
         } else {
@@ -116,6 +127,9 @@ public class ShopItemPanel extends JPanel {
         repaint();
     }
 
+    /**
+     * Clears the current item and updates the UI to show the slot is empty.
+     */
     public void clearItem() {
         this.item = null;
         nameLabel.setText("Sold Out");
@@ -125,10 +139,20 @@ public class ShopItemPanel extends JPanel {
         repaint();
     }
 
+    /**
+     * Returns the currently displayed item.
+     *
+     * @return The current item, or null if no item is set
+     */
     public Item getItem() {
         return item;
     }
 
+    /**
+     * Adds an action listener to the buy button.
+     *
+     * @param listener The action listener to add
+     */
     public void addBuyButtonListener(ActionListener listener) {
         buyButton.addActionListener(listener);
     }

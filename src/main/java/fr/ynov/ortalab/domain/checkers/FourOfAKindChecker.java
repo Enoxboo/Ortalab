@@ -9,6 +9,10 @@ import java.util.List;
 import java.util.Set;
 import java.util.HashSet;
 
+/**
+ * Checks for a Four of a Kind hand (four cards of the same value).
+ * Also selects the highest remaining card as a kicker.
+ */
 public class FourOfAKindChecker implements HandChecker {
 
     @Override
@@ -19,6 +23,7 @@ public class FourOfAKindChecker implements HandChecker {
             return false;
         }
 
+        // Get the cards that make up the four of a kind
         CardValue quadsValue = fourOfAKindValues.getFirst();
         List<Card> quadsCards = cards.stream()
                 .filter(card -> card.value() == quadsValue)
@@ -28,7 +33,7 @@ public class FourOfAKindChecker implements HandChecker {
         usedCards.addAll(quadsCards);
         coreCards.addAll(quadsCards);
 
-        // Find highest kicker
+        // Find the highest kicker to complete the 5-card hand
         Set<CardValue> excludeValues = new HashSet<>();
         excludeValues.add(quadsValue);
         List<Card> kickers = HandUtils.getTopCardsByValue(cards, excludeValues, 1);

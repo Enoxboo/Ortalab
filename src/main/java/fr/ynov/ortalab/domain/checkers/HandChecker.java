@@ -8,14 +8,15 @@ import java.util.Set;
 
 /**
  * Interface for poker hand checkers.
+ * Each implementation checks for a specific poker hand type.
  */
 public interface HandChecker {
     /**
      * Checks if the given cards form a specific hand type.
      *
      * @param cards The cards to check
-     * @param usedCards A set to be populated with the cards used in the hand
-     * @param coreCards A set to be populated with the core cards of the hand (no kickers)
+     * @param usedCards A set to be populated with the cards used in the hand (includes kickers)
+     * @param coreCards A set to be populated with the core cards of the hand (excludes kickers)
      * @return true if the hand type is found, false otherwise
      */
     boolean checkHand(List<Card> cards, Set<Card> usedCards, Set<Card> coreCards);

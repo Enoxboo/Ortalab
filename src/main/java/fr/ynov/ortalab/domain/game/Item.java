@@ -1,9 +1,11 @@
 package main.java.fr.ynov.ortalab.domain.game;
 
-import main.java.fr.ynov.ortalab.config.GameConfig;
-
 import java.util.function.Consumer;
 
+/**
+ * Represents an equippable item that provides bonuses to the player.
+ * Uses the Builder pattern for flexible item creation.
+ */
 public class Item {
     private final String name;
     private final String description;
@@ -14,6 +16,10 @@ public class Item {
     private final Consumer<Player> applyEffect;
     private final Consumer<Player> removeEffect;
 
+    /**
+     * Defines item rarity levels with associated drop rates.
+     * Higher rarity items are less likely to drop.
+     */
     public enum ItemRarity {
         TEST(1.0f),
         COMMON(0.7f),
@@ -30,6 +36,12 @@ public class Item {
         }
     }
 
+    /**
+     * Private constructor that works with the Builder pattern.
+     * All item creation should go through the Builder.
+     *
+     * @param builder The builder containing item configuration
+     */
     private Item(Builder builder) {
         this.name = builder.name;
         this.description = builder.description;
@@ -41,17 +53,31 @@ public class Item {
         this.removeEffect = builder.removeEffect;
     }
 
+    /**
+     * Apply this item's effect to a player.
+     * Called when an item is added to inventory.
+     *
+     * @param player The player to apply effects to
+     */
     public void applyTo(Player player) {
         if (applyEffect != null) {
             applyEffect.accept(player);
         }
     }
 
+    /**
+     * Remove this item's effect from a player.
+     * Called when an item is sold or removed.
+     *
+     * @param player The player to remove effects from
+     */
     public void removeFrom(Player player) {
         if (removeEffect != null) {
             removeEffect.accept(player);
         }
     }
+
+    // ==================== GETTERS ====================
 
     public String getName() {
         return name;
@@ -77,6 +103,10 @@ public class Item {
         return sellValue;
     }
 
+    /**
+     * Builder class for creating Item instances with a fluent API.
+     * Enforces required name field and provides defaults for optional fields.
+     */
     public static class Builder {
         private final String name;
         private String description;
@@ -87,6 +117,11 @@ public class Item {
         private Consumer<Player> applyEffect;
         private Consumer<Player> removeEffect;
 
+        /**
+         * Create a new builder with the required item name.
+         *
+         * @param name The name of the item (required)
+         */
         public Builder(String name) {
             this.name = name;
         }
@@ -116,12 +151,24 @@ public class Item {
             return this;
         }
 
+        /**
+         * Set the effect functions for this item.
+         *
+         * @param applyEffect Function called when item is equipped
+         * @param removeEffect Function called when item is removed
+         * @return This builder for method chaining
+         */
         public Builder effect(Consumer<Player> applyEffect, Consumer<Player> removeEffect) {
             this.applyEffect = applyEffect;
             this.removeEffect = removeEffect;
             return this;
         }
 
+        /**
+         * Build and return the final Item instance.
+         *
+         * @return The configured Item
+         */
         public Item build() {
             return new Item(this);
         }

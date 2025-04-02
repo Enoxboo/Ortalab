@@ -7,7 +7,7 @@ import main.java.fr.ynov.ortalab.gui.frames.MainGameFrame;
 import javax.swing.JOptionPane;
 
 public class OrtalabGUI {
-    public static void main(String[] args) throws DeckException {
+    public static void launch() throws DeckException {
         try {
             GameManager gameManager = new GameManager();
 
