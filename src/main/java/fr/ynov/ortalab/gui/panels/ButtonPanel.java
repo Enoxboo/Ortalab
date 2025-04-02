@@ -1,7 +1,7 @@
 package main.java.fr.ynov.ortalab.gui.panels;
 
 import main.java.fr.ynov.ortalab.domain.card.Card;
-import main.java.fr.ynov.ortalab.domain.HandEvaluator;
+import main.java.fr.ynov.ortalab.domain.game.HandEvaluator;
 import main.java.fr.ynov.ortalab.domain.game.managers.GameManager;
 
 import javax.swing.JPanel;

@@ -1,9 +1,8 @@
-package main.java.fr.ynov.ortalab.domain;
+package main.java.fr.ynov.ortalab.domain.game;
 
 import main.java.fr.ynov.ortalab.domain.card.Card;
 import main.java.fr.ynov.ortalab.domain.card.CardSuit;
 import main.java.fr.ynov.ortalab.domain.card.CardValue;
-import main.java.fr.ynov.ortalab.domain.game.Player;
 
 import java.util.HashSet;
 import java.util.List;

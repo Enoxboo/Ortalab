@@ -1,4 +1,4 @@
-package main.java.fr.ynov.ortalab.domain;
+package main.java.fr.ynov.ortalab.domain.game;
 
 /**
  * Represents the different types of poker hands, ordered from lowest to highest value.

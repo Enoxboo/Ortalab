@@ -3,8 +3,6 @@ package main.java.fr.ynov.ortalab.domain.game;
 import main.java.fr.ynov.ortalab.config.GameConfig;
 import main.java.fr.ynov.ortalab.domain.card.Card;
 import main.java.fr.ynov.ortalab.domain.card.CardSuit;
-import main.java.fr.ynov.ortalab.domain.HandType;
-import main.java.fr.ynov.ortalab.domain.PointsCalculator;
 import main.java.fr.ynov.ortalab.domain.exceptions.DeckException;
 import main.java.fr.ynov.ortalab.domain.exceptions.PlayerActionException;
 import main.java.fr.ynov.ortalab.domain.exceptions.CardOperationException;
