@@ -6,6 +6,7 @@ import main.java.fr.ynov.ortalab.domain.game.Enemy;
 import main.java.fr.ynov.ortalab.domain.game.Player;
 import main.java.fr.ynov.ortalab.gui.panels.*;
 import main.java.fr.ynov.ortalab.domain.game.managers.GameManager.GameState;
+import main.java.fr.ynov.ortalab.gui.components.CircleItemSlot;
 
 import javax.swing.JFrame;
 import javax.swing.JPanel;
@@ -16,12 +17,17 @@ import javax.swing.Box;
 import javax.swing.SwingUtilities;
 import javax.swing.Timer;
 import javax.swing.SwingConstants;
+import javax.swing.BorderFactory;
 import java.awt.Dimension;
 import java.awt.Component;
 import java.awt.Font;
 import java.awt.BorderLayout;
 import java.awt.GridLayout;
 import java.awt.FlowLayout;
+import java.awt.Color;
+import java.util.ArrayList;
+import java.util.List;
+import javax.swing.BoxLayout;
 
 /**
  * The main game interface showing player and enemy status, player's hand,
@@ -37,6 +43,11 @@ public class MainGameFrame extends JFrame {
     private StatusPanel enemyStatusPanel;
     private SortButtonPanel sortButtonPanel;
     private JLabel currentHandPointsLabel;
+
+    // Inventory Components
+    private static final int MAX_INVENTORY_SLOTS = 6;
+    private final List<CircleItemSlot> inventorySlots = new ArrayList<>();
+    private JPanel inventoryPanel;
 
     // Timer to check game state periodically
     private Timer gameStateTimer;
@@ -74,6 +85,10 @@ public class MainGameFrame extends JFrame {
         // Create center panel with status panels
         JPanel centerPanel = createStatusPanel();
         mainContentPanel.add(centerPanel, BorderLayout.CENTER);
+
+        // Create and add inventory panel to the right
+        inventoryPanel = createInventoryPanel();
+        mainContentPanel.add(inventoryPanel, BorderLayout.EAST);
 
         // Add main content panel to the frame
         add(mainContentPanel, BorderLayout.CENTER);
@@ -163,6 +178,37 @@ public class MainGameFrame extends JFrame {
     }
 
     /**
+     * Creates the inventory panel displaying player's current items.
+     * Uses the same style as the ItemShopFrame's inventory panel.
+     *
+     * @return A JPanel displaying the player's inventory
+     */
+    private JPanel createInventoryPanel() {
+        JPanel inventoryPanel = new JPanel();
+        inventoryPanel.setPreferredSize(new Dimension(200, 0));
+        inventoryPanel.setBorder(BorderFactory.createTitledBorder("Inventory"));
+        inventoryPanel.setLayout(new BoxLayout(inventoryPanel, BoxLayout.Y_AXIS));
+
+        JPanel slotsPanel = new JPanel(new GridLayout(3, 2, 20, 20));
+        slotsPanel.setBorder(BorderFactory.createEmptyBorder(30, 20, 30, 20));
+
+        for (int i = 0; i < MAX_INVENTORY_SLOTS; i++) {
+            CircleItemSlot slot = new CircleItemSlot();
+            inventorySlots.add(slot);
+            slotsPanel.add(slot);
+        }
+
+        inventoryPanel.add(Box.createVerticalStrut(20));
+        inventoryPanel.add(slotsPanel);
+        inventoryPanel.add(Box.createVerticalGlue());
+
+        // Initialize the inventory slots with player's current items
+        updateInventoryDisplay();
+
+        return inventoryPanel;
+    }
+
+    /**
      * Creates the bottom panel containing the player's hand and action buttons.
      *
      * @return A JPanel for the bottom section of the game
@@ -237,6 +283,26 @@ public class MainGameFrame extends JFrame {
     }
 
     /**
+     * Updates the inventory display to reflect player's current items.
+     */
+    private void updateInventoryDisplay() {
+        Player player = gameManager.getPlayer();
+        List<main.java.fr.ynov.ortalab.domain.game.Item> inventory = player.getInventory();
+
+        // Clear all slots first
+        for (CircleItemSlot slot : inventorySlots) {
+            slot.clearItem();
+        }
+
+        // Populate slots with inventory items
+        for (int i = 0; i < inventory.size(); i++) {
+            if (i < inventorySlots.size()) {
+                inventorySlots.get(i).setItem(inventory.get(i));
+            }
+        }
+    }
+
+    /**
      * Refreshes the game display after returning from the shop
      * or when game state changes.
      */
@@ -248,6 +314,9 @@ public class MainGameFrame extends JFrame {
         playerStatusPanel.updateStatus(player, enemy, currentLevel);
         enemyStatusPanel.updateStatus(player, enemy, currentLevel);
         handPanel.sortHand(handPanel.getCurrentSortType());
+
+        // Update inventory display with latest items
+        updateInventoryDisplay();
     }
 
     /**
